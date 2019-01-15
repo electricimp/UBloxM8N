@@ -130,7 +130,7 @@ This parser is a table, so it can be easily expanded. A small number of messages
 
 ### Class Methods ###
 
-#### [UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT](payload) ####
+#### 0x0107 (payload) ####
 
 Parses `0x0107` (NAV_PVT) UBX message payload.
 
