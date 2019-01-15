@@ -24,22 +24,14 @@
 
 // Partial list only includes those currently used in the parsing table
 enum UBX_MSG_PARSER_CLASS_MSG_ID {
-    NAV_PVT   = 0x0107,         // Used in basic parser
-    NAV_SAT   = 0x0135,         // Used in basic parser
-
-    ACK_ACK   = 0x0501,         // Used in basic parser
-    ACK_NAK   = 0x0500,         // Used in basic parser
-
-    // CFG_INF   = 0x0602,
-    // CFG_NAVX5 = 0x0623,
-    // CFG_PM2   = 0x063b,
-
-    MON_HW    = 0x0a09,         // Used in basic parser
-    MON_VER   = 0x0a04,         // Used in basic parser
-
-    // MGA_INI   = 0x1340,
-    MGA_ACK   = 0x1360          // Used in basic parser
-
+    NAV_PVT   = 0x0107,
+    NAV_SAT   = 0x0135,
+    ACK_ACK   = 0x0501,
+    ACK_NAK   = 0x0500,
+    MON_HW    = 0x0a09,
+    MON_VER   = 0x0a04,
+    MGA_ACK   = 0x1360
+}
 
 /**
  * This table contains functions for parsing UBX messages received by UBLOX M8N
@@ -75,7 +67,7 @@ UbxMsgParser <- {}
  *              @tableEntry {bool} validDate - valid UTC Date
  *              @tableEntry {bool} validTime - valid UTC Time of Day
  *              @tableEntry {bool} fullyResolved - UTC Time of Day has been fully resolved (no seconds uncertainty)
- *              @tableEntry {bool} validMag - 1 = valid Magnetic declination
+ *              @tableEntry {bool} validMag - valid Magnetic declination
  *      @tableEntry {integer} tAcc - Time accuracy estimate in ns (UTC)
  *      @tableEntry {integer} nano - Fraction of second, range -1e9 .. 1e9 in ns (UTC)
  *      @tableEntry {integer} fixType - GNSSfix Type: 0 = no fix, 1 = dead reckoning only,
@@ -84,7 +76,7 @@ UbxMsgParser <- {}
  *              @tableEntry {integer} gnssFixOK - 1 = valid fix (i.e within DOP & accuracy masks)
  *              @tableEntry {integer} diffSoln - 1 = differential corrections were applied
  *              @tableEntry {integer} psmState - Power Save Mode state: 0 = PSM is not active,
- *                  1 = Enabled (an intermediate state before Acquisition state, 2 = Acquisition,
+ *                  1 = Enabled (an intermediate state before Acquisition state), 2 = Acquisition,
  *                  3 = Tracking, 4 = Power Optimized Tracking, 5 = Inactive
  *              @tableEntry {integer} headVehValid - 1 = heading of vehicle is valid
  *              @tableEntry {integer} carrSoln - Carrier phase range solution status (not supported in
@@ -100,7 +92,7 @@ UbxMsgParser <- {}
  *      @tableEntry {integer} lon - Longitude in deg
  *      @tableEntry {integer} lat - Latitude in deg
  *      @tableEntry {integer} height - Height above ellipsoid in mm
- *      @tableEntry {integer} hMSL - Height above mean sea leve mm
+ *      @tableEntry {integer} hMSL - Height above mean sea level mm
  *      @tableEntry {blob} hAcc - 4 byte unsigened integer, Horizontal accuracy estimate in mm
  *      @tableEntry {blob} vAcc - 4 byte unsigened integer, Vertical accuracy estimate in mm
  *      @tableEntry {integer} velN - NED north velocity in mm/s
@@ -117,7 +109,7 @@ UbxMsgParser <- {}
  *      @tableEntry {integer} magAcc - Magnetic declination accuracy in deg
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
-    // 92 Bytes
+    // 0x0107: Expected payload size = 92 Bytes
     payload.seek(0, 'b');
     local iTOW = payload.readblob(4);
     local year = payload.readn('w');
@@ -208,9 +200,9 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
  *      @tableEntry {integer} numSvs - Number of satellites
  *      @tableEntry {object[]} satInfo - Array of satelite info tables
  *              {table} - Satelite info
- *                  @tableEntry {bool} gnssId - GNSS identifier
- *                  @tableEntry {bool} svId - Satellite identifier
- *                  @tableEntry {bool} cno - Carrier to noise ratio (signal strength) in dBHz
+ *                  @tableEntry {integer} gnssId - GNSS identifier
+ *                  @tableEntry {integer} svId - Satellite identifier
+ *                  @tableEntry {integer} cno - Carrier to noise ratio (signal strength) in dBHz
  *                  @tableEntry {integer} elev - Elevation (range: +/-90), unknown if out of range, in deg
  *                  @tableEntry {integer} azim - Azimuth (range 0-360), unknown if elevation is out of range, in deg
  *                  @tableEntry {integer} prRes - Pseudorange residual in m
@@ -238,7 +230,7 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
  *                      @tableEntry {integer} doCorrUsed - 1 = Range rate (Doppler) corrections have been used
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT] <- function(payload) {
-    // 8 + 12*n bytes
+    // 0x0135: Expected payload size = 8 + 12*n bytes
     payload.seek(0, 'b');
     local iTOW = payload.readblob(4);
     local parsed = {
@@ -298,7 +290,8 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT] <- function(payload) {
  * @return {integer} The 2 byte message class and ID for the ACK-ed message
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_ACK] <- function(payload) {
-    // 2 bytes, returns classid of ACK-ed msg
+    // 0x0501: Expected payload size = 2 bytes
+    // Returns classid of ACK-ed msg
     return payload[0] << 4 | payload[1];
 };
 
@@ -310,7 +303,8 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_ACK] <- function(payload) {
  * @return {integer} The 2 byte message class and ID for the NAK-ed message
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_NAK] <- function(payload) {
-    // 2 bytes, returns classid of NAK-ed msg
+    // 0x0500: Expected payload size = 2 bytes
+    // Returns classid of NAK-ed msg
     return payload[0] << 4 | payload[1];
 };
 
@@ -386,7 +380,7 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER] <- function(payload) {
  *      @tableEntry {blob} pullL - Mask of Pins Value using the PIO Pull Low Resistor
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
-    // 60 bytes
+    // 0x0a09: Expected payload size = 60 bytes
     payload.seek(0, 'b');
     local parsed = {
         "pinSel"     : payload.readblob(4),
@@ -440,7 +434,7 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
  *          payload
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK] <- function(payload) {
-    // 8 bytes
+    // 0x1360: Expected payload size = 8 bytes
     payload.seek(0, 'b');
     return {
         "type"            : payload.readn('b'),
