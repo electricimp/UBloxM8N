@@ -323,11 +323,11 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER] <- function(payload) {
     payload.seek(0, 'b');
     local sw = payload.readstring(30);
     local last = sw.find("\x00");
-    sw = sw.slice(0, last));
+    sw = sw.slice(0, last);
 
     local hw = payload.readstring(10);
     last = hw.find("\x00");
-    hw = hw.slice(0, last));
+    hw = hw.slice(0, last);
 
     local parsed = {
         "swVersion" : sw,
