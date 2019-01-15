@@ -61,7 +61,7 @@ Input/Output Mode Selector Options:
 
 None.
 
-#### enableUBXMsg(classid, rate, handler = null) ####
+#### enableUBXMsg(classid, rate[, handler]) ####
 
 Enables the specified UBX messages to be received at the specified rate interval. When messages are received they will be passed to the handler. If no handler is specified messages will be passed to a default handler instead. **Note:** To disable UBX msgs send the enable command a second time.
 
@@ -199,7 +199,7 @@ Fix Status Flags
 | *confirmedDate* | integer | 1 = UTC Date validity could be confirmed. |
 | *confirmedTime* | integer | 1 = UTC Time of Day could be confirmed. |
 
-#### [UBLOX_M8N_UBX_CLASS_MSG_ID.NAV_SAT](payload) ####
+#### 0x0135 (payload) ####
 
 Parses `0x0135` (NAV_SAT) UBX message payload.
 
@@ -253,7 +253,7 @@ Satellite Info Flags
 | *crCorrUsed* | integer | 1 = Carrier range corrections have been used. |
 | *doCorrUsed* | integer | 1 = Range rate (Doppler) corrections have been used. |
 
-#### [UBLOX_M8N_UBX_CLASS_MSG_ID.ACK_ACK](payload) ####
+#### 0x0501 (payload) ####
 
 Parses `0x0501` (ACK_ACK) UBX message payload.
 
@@ -267,7 +267,7 @@ Parses `0x0501` (ACK_ACK) UBX message payload.
 
 An integer, the 2 byte message class and ID for the ACK-ed message.
 
-#### [UBLOX_M8N_UBX_CLASS_MSG_ID.ACK_NAK](payload) ####
+#### 0x0500 (payload) ####
 
 Parses `0x0500` (ACK_NAK) UBX message payload.
 
@@ -281,7 +281,7 @@ Parses `0x0500` (ACK_NAK) UBX message payload.
 
 An integer, the 2 byte message class and ID for the NAK-ed message.
 
-#### [UBLOX_M8N_UBX_CLASS_MSG_ID.MON_VER](payload) ####
+#### 0x0a04 (payload) ####
 
 Parses `0x0a04` (MON_VER) UBX message payload.
 
@@ -301,7 +301,7 @@ A table.
 | *hwVersion* | sting | Hardware Version. |
 | *exSwInfo* | array | Array of extended software info strings, if any. |
 
-#### [UBLOX_M8N_UBX_CLASS_MSG_ID.MON_HW](payload) ####
+#### 0x0a09 (payload) ####
 
 Parses `0x0a09` (MON_HW) UBX message payload.
 
@@ -342,7 +342,7 @@ Flags Table
 | *jammingState* | integer | output from Jamming/Interference Monitor: 0 = unknown or feature disabled, 1 = ok - no significant jamming, 2 = warning - interference visible but fix OK, 3 = critical - interference visible and no fix. |
 | *xtalAbsent* | integer | RTC xtal has been determined to be absent. (not supported in protocol versions less than 18). |
 
-#### [UBLOX_M8N_UBX_CLASS_MSG_ID.MGA_ACK](payload) ####
+#### 0x1360 (payload) ####
 
 Parses `0x1360` (MGA_ACK) UBX message payload.
 
