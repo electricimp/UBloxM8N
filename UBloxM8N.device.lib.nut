@@ -124,8 +124,8 @@ class UBloxM8N {
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
      *
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
-     * @param {integer} [classid] - UBX message class and id. All general and UBX handlers must include this
-     *      as an optional parameter. NMEA handlers do not need this parameter.
+     * @param {integer} [classid] - UBX message class and id. All general and general UBX handlers will use
+     *      this parameter. UBX message specific handlers, and NMEA handlers do not need this parameter.
      * @callback onMessageReceivedCallback
      */
     function configure(opts) {
@@ -285,6 +285,23 @@ class UBloxM8N {
 
         // Send sentence
         _gpsuart.write(sentence);
+    }
+
+    /**
+     * Writes an assist entry.
+     *
+     * @param {string} entry - An assist entry string
+     */
+    function writeAssist(entry) {
+        if (_booting) {
+            imp.wakeup(_bootTimeout, function() {
+                writeAssist(entry);
+            }.bindenv(this))
+            return;
+        }
+
+        // Send entry
+        _gpsuart.write(entry);
     }
 
     // Helper function that creates a UBX CFG_PRT payload
@@ -452,16 +469,11 @@ class UBloxM8N {
     function _processUBXPacket(classid, payload) {
         // Handle packet based on class id
         if (classid in _msgHandlers) {
-            _msgHandlers[classid](payload, classid);
+            _msgHandlers[classid](payload);
         } else if (UBLOX_M8N_CONST.UBX_MSG_HANDLER in _msgHandlers) {
             _msgHandlers[UBLOX_M8N_CONST.UBX_MSG_HANDLER](payload, classid);
         } else if (UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER in _msgHandlers) {
             _msgHandlers[UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER](payload, classid);
-        } else {
-            // No handler registered - Library Debug logs only
-            // DO NOT PUBLISH WITH LIBRARY!!!
-            server.log("No handlers registered for message: " + classid);
-            server.log(payload);
         }
     }
 

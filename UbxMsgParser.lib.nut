@@ -1,27 +1,3 @@
-// MIT License
-//
-// Copyright 2019 Electric Imp
-//
-// SPDX-License-Identifier: MIT
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
-// EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
-// OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-// OTHER DEALINGS IN THE SOFTWARE.
-
 // Partial list only includes those currently used in the parsing table
 enum UBX_MSG_PARSER_CLASS_MSG_ID {
     NAV_PVT   = 0x0107,
@@ -42,7 +18,7 @@ enum UBX_MSG_PARSER_CLASS_MSG_ID {
  * are a function that takes the UBX message payload and returns either a table of
  * parsed payload values or for ack/nak messages the 2 byte message class-id for the
  * ack/nak-ed message. Note: Squirrel only supports signed 32 bit integers. If the
- * paylaod conatins a 32 bit unsigned integer the parsed table will contain a 4 byte
+ * payload conatins a 32 bit unsigned integer the parsed table will contain a 4 byte
  * blob with the payload values. These values are in the same order as received
  * by the M8N (little endian).
  *
@@ -166,7 +142,7 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
         "valid"          : valid,
         "tAcc"           : tAcc,            // Time Accuracy estimate (UTC)
         "nano"           : nano,            // Nanoseconds (UTC)
-        "fixType"        : payload[20],     // Fix Type (see enum UBX_MSG_PARSER_FIX_TYPE)
+        "fixType"        : payload[20],     // Fix Type (see docs)
         "fixStatusFlags" : fixStatusFlags,
         "numSV"          : payload[23],     // Num Satelites used in Nav Solution
         "lon"            : lon,             // Longitude (deg)
@@ -314,8 +290,9 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_NAK] <- function(payload) {
  * @param {blob} payload - parses 40 + 30*n bytes MON_VER message payload.
  *
  * @return {table}
- *      @tableEntry {string} swVersion - Software Version.
+ *      @tableEntry {string} swVersion - Software Version
  *      @tableEntry {string} hwVersion - Hardware Version
+ *      @tableEntry {string} protver - Supported protocol version
  *      @tableEntry {object[]} [exSwInfo] - Array of extended software info strings, if any
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER] <- function(payload) {
@@ -339,7 +316,15 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER] <- function(payload) {
     while (payload.eos() == null) {
         local info = payload.readstring(30);
         last = info.find("\x00");
-        exSwInfo.push(info.slice(0, last));
+        local str = info.slice(0, last);
+        exSwInfo.push(str);
+        if (info.find("PROTVER") != null) {
+            local ex = regexp(@"(\d+)[.](\d+)");
+            local match = ex.search(info);
+            if (match != null) {
+                parsed.protver <- info.slice(match.begin, match.end);
+            }
+        }
     }
     if (exSwInfo.len() > 0) parsed.exSwInfo <- exSwInfo;
 
