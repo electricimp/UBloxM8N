@@ -79,14 +79,15 @@ class UBloxM8N {
 
     /**
      * Initializes Ublox M8N driver object. The constructor will initialize the specified hardware.uart object
-     * using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified
+     * using either the specified baud rate or a default baud rate of 9600 (the default baud rate specified
      * in the Ublox data sheet).
      *
      * @constructor
      * @param {imp::uart} uart - An uninitialized imp API hardware.uart object that is connected to the M8N GPS module.
-     * @param {integer} [bootTimeoutSec] - Time in seconds to wait before sending commands to GPS after booting.
-     * @param {integer}  [baudrate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE] - The baud rate used to configure the uart.
+     * @param {integer} [bootTimeoutSec = UBLOX_M8N_CONST.DEFAULT_BOOT_TIMEOUT] - Time in seconds to wait before sending commands to GPS after booting.
+     * @param {integer} [baudrate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE] - The baud rate used to configure the uart.
      */
+    // TODO: baudrate -> initialBaudrate or configurationBaudrate
     constructor(uart, bootTimeoutSec = UBLOX_M8N_CONST.DEFAULT_BOOT_TIMEOUT, baudrate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE) {
         _currBaudRate = baudrate;
         _gpsuart = uart;
@@ -123,10 +124,10 @@ class UBloxM8N {
     /**
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
      *
+     * @callback onMessageReceivedCallback
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
      * @param {integer} [classid] - UBX message class and id. The defaultMsgHandler and general ubxMsgHandler will use
      *      this parameter. UBX message specific handlers and NMEA handlers do not pass anything to this parameter.
-     * @callback onMessageReceivedCallback
      */
     function configure(opts) {
         if (_booting) {
@@ -149,7 +150,7 @@ class UBloxM8N {
             local nmeaCmd = format("%s,%i,%04x,%04x,%i,0", UBLOX_M8N_CONST.NMEA_CONFIG_MSG_HEADER, UBLOX_M8N_CONST.DEFAULT_PORT, input, output, _currBaudRate);
             writeNMEA(nmeaCmd);
             _gpsuart.flush();
-            imp.sleep(0.1);
+            imp.sleep(0.1); // TODO: should probably be moved to a constant
 
             local ubxPayload = _getUbxCfgPrtPayload(_currBaudRate, input, output);
             writeUBX(UBLOX_M8N_CONST.UBX_CFG_PRT_CLASS_MSG_ID, ubxPayload);
@@ -199,11 +200,13 @@ class UBloxM8N {
     /**
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
      *
+     * @callback onMessageReceivedCallback
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
      * @param {integer} [classid] - UBX message class and id. All general and UBX handlers must include this
      *      as an optional parameter. NMEA handlers do not need this parameter.
-     * @callback onMessageReceivedCallback
      */
+    // TODO: (optional) sometimes I feel like "callback" is better than "handler"
+    // TODO: would probably call this `onMessage`
     function registerMsgHandler(type, handler) {
         _msgHandlers[type] <- handler;
     }
@@ -223,6 +226,9 @@ class UBloxM8N {
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
      * @callback onMessageReceivedCallback
      */
+
+    // TODO: classid -> classId
+    // TODO: should probably be called toggleUSBMsg...
     function enableUBXMsg(classid, rate, handler = null) {
         // Store handler
         if (handler != null) _msgHandlers[classid] <- handler;
@@ -237,6 +243,7 @@ class UBloxM8N {
      * @param {integer} classid - the 2 byte message class and ID.
      * @param {blob/string} payload - the message payload.
      */
+    // TODO: classId?
     function writeUBX(classid, payload) {
         if (_booting) {
             imp.wakeup(_bootTimeout, function() {
@@ -273,6 +280,7 @@ class UBloxM8N {
         if (sentence[0] != UBLOX_M8N_CONST.NMEA_START_CHAR) sentence = UBLOX_M8N_CONST.NMEA_START_CHAR + sentence;
 
         // Add check sum and/or ending characters if needed
+        // TODO: the following set of if-else blocks can probably be optimized...
         local astIdx = sentence.find("*");
         if (astIdx == null) {
             // Delete ending characters if there were any
@@ -286,7 +294,9 @@ class UBloxM8N {
             // Delete ending characters if there were any
             sentence = strip(sentence);
             // Add correct ending characters
-            sentence = format("%s%c%c", sentence, _calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
+
+            // TODO: doublecheck the string format
+            sentence = format("%s%02x%c%c", sentence, _calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
         }
 
         // Send sentence
@@ -323,6 +333,7 @@ class UBloxM8N {
     }
 
     // Helper function that creates a UART callback based on the input message mode
+    // TODO: callback?
     function _createUartHandler(mode) {
         local processByte;
         switch(mode) {
@@ -465,6 +476,7 @@ class UBloxM8N {
 
         if (actualCheckSum == calcCheckSum) {
             // Packet is valid
+            // TODO: classId?
             local classid = (packet[0] << 8) | packet[1];
             packet.seek(4, 'b');
             local payload = packet.readblob(bLen);
