@@ -4,7 +4,7 @@ Electric Imp offers two libraries to support the UBLOX M8N GPS module: a device-
 
 ## UBloxM8N ##
 
-UART driver for UBLOX M8N GPS module.
+UART driver for u-blox M8N GPS module.
 
 **To add this library to your project, add** `#require "UBloxM8N.device.lib.nut:1.0.0"` **to the top of your device code.**
 
@@ -14,16 +14,18 @@ UART driver for UBLOX M8N GPS module.
 
 When a valid message is received from the M8N it will be passed to a message handler if there is one. For any message only **one** handler will be triggered. If a message specific handler is available it will be used. If no message specific handler is available, the more general type specific *nmeaMsgHandler* or *ubxMsgHandler* will be used. If there are no message specific and no type specific handlers registered, then the *defaultMsgHandler* will be used.
 
-Handler parameters:
+Handler Details:
 
-    - *ubxMsgHandler* take 2 required parameters, the first is payload the second is the msg class-id, an integer.
-    - *defaultMsgHandler* take one required parameter and one optional parameter, the first required parameter is the ubx payload or NMEA sentence, the second optional is only there for ubx messages and is the msg class-id, an integer.
-    - *nmeaMsgHandler* takes one required parameter, the NMEA sentence.
-    - ubx message specific handler, takes one required parameter ubx message payload.
+| Handler Name | Register Handler Type | Parameters | Parameter Description(s) |
+| --- | --- | --- | --- |
+| *defaultMsgHandler* | UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER | 1 required, 1 optional | first parameter (req): blob/string *payload/NMEA Sentence*, second parameter (opt): integer *class-id* |
+| *ubxMsgHandler* | UBLOX_M8N_CONST.UBX_MSG_HANDLER | 2 required | first parameter: blob *payload*, second parameter: integer *class-id* |
+| *nmeaMsgHandler* | UBLOX_M8N_CONST.NMEA_MSG_HANDLER | 1 required | first parameter: string *NMEA Sentence* |
+| *ubx message specific handler* | Integer: Message Class Id | 1 required  | first parameter: blob *payload* |
 
 #### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, baudrate]*) ####
 
-Initializes Ublox M8N driver object. The constructor will initialize the specified hardware.uart object using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified in the Ublox data sheet).
+Initializes u-blox M8N driver object. The constructor will initialize the specified hardware.uart object using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified in the u-blox data sheet).
 
 ##### Parameters #####
 
@@ -31,7 +33,7 @@ Initializes Ublox M8N driver object. The constructor will initialize the specifi
 | --- | --- | --- | --- |
 | *uart* | string | Yes | An imp UART bus to which the GPS module is connected. |
 | *bootTimeoutSec* | integer/float | No | The time in seconds to wait after boot before the GPS is be ready for commands. Default is 1 sec. |
-| *baudrate* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the Ublox data sheet). |
+| *baudrate* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the u-blox data sheet). |
 
 ### Class Methods ###
 
@@ -43,7 +45,7 @@ Use this method to configure the uart baud rate, define the message type(s) the 
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *options* | table | Yes | A table of settings used to configure the UBLOX module *(see below)* |
+| *options* | table | Yes | A table of settings used to configure the u-blox module *(see below)* |
 
 The *options* table may contain any of the following keys:
 
