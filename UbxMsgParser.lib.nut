@@ -24,7 +24,9 @@ enum UBX_MSG_PARSER_CLASS_MSG_ID {
  *
  * @table
  */
-UbxMsgParser <- {}
+UbxMsgParser <- {
+    "VERSION" : "1.0.0"
+}
 
 /**
  * Parses 0x0107 (NAV_PVT) UBX message payload.
