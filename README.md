@@ -23,7 +23,7 @@ Handler Details:
 | *nmeaMsgHandler* | UBLOX_M8N_CONST.NMEA_MSG_HANDLER | 1 required | first parameter: string *NMEA Sentence* |
 | *ubx message specific handler* | Integer: Message Class Id | 1 required  | first parameter: blob *payload* |
 
-#### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, baudrate]*) ####
+#### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, bootBaudRate]*) ####
 
 Initializes u-blox M8N driver object. The constructor will initialize the specified hardware.uart object using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified in the u-blox data sheet).
 
@@ -33,13 +33,13 @@ Initializes u-blox M8N driver object. The constructor will initialize the specif
 | --- | --- | --- | --- |
 | *uart* | string | Yes | An imp UART bus to which the GPS module is connected. |
 | *bootTimeoutSec* | integer/float | No | The time in seconds to wait after boot before the GPS is be ready for commands. Default is 1 sec. |
-| *baudrate* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the u-blox data sheet). |
+| *bootBaudRate* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the u-blox data sheet). |
 
 ### Class Methods ###
 
 #### configure(*options*) ####
 
-Use this method to configure the uart baud rate, define the message type(s) the M8N will accept, define the message type(s) the M8N will send, and to set default message handlers for incoming messages from the M8N. **Note:** This method will re-configure the uart bus.
+Use this method to configure a new uart baud rate, define the message type(s) the M8N will accept, define the message type(s) the M8N will send, and to set default message handlers for incoming messages from the M8N. **Note:** This method will re-configure the uart bus.
 
 ##### Parameters #####
 

@@ -85,10 +85,10 @@ class UBloxM8N {
      * @constructor
      * @param {imp::uart} uart - An uninitialized imp API hardware.uart object that is connected to the M8N GPS module.
      * @param {integer} [bootTimeoutSec] - Time in seconds to wait before sending commands to GPS after booting.
-     * @param {integer}  [baudrate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE] - The baud rate used to configure the uart.
+     * @param {integer}  [bootBaudRate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE] - The baud rate used to configure the uart.
      */
-    constructor(uart, bootTimeoutSec = UBLOX_M8N_CONST.DEFAULT_BOOT_TIMEOUT, baudrate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE) {
-        _currBaudRate = baudrate;
+    constructor(uart, bootTimeoutSec = UBLOX_M8N_CONST.DEFAULT_BOOT_TIMEOUT, bootBaudRate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE) {
+        _currBaudRate = bootBaudRate;
         _gpsuart = uart;
         _gpsuart.configure(_currBaudRate, 8, PARITY_NONE, 1, NO_CTSRTS, _createUartHandler(UBLOX_M8N_MSG_MODE.BOTH));
 
@@ -122,11 +122,11 @@ class UBloxM8N {
      */
     /**
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
+     * @callback onMessageReceivedCallback
      *
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
      * @param {integer} [classid] - UBX message class and id. The defaultMsgHandler and general ubxMsgHandler will use
      *      this parameter. UBX message specific handlers and NMEA handlers do not pass anything to this parameter.
-     * @callback onMessageReceivedCallback
      */
     function configure(opts) {
         if (_booting) {
