@@ -14,12 +14,14 @@ UART driver for UBLOX M8N GPS module.
 
 When a valid message is received from the M8N it will be passed to a message handler if there is one. For any message only **one** handler will be triggered. If a message specific handler is available it will be used. If no message specific handler is available, the more general type specific *nmeaMsgHandler* or *ubxMsgHandler* will be used. If there are no message specific and no type specific handlers registered, then the *defaultMsgHandler* will be used.
 
-Handler parameters:
+Handler Details:
 
-    - *ubxMsgHandler* take 2 required parameters, the first is payload the second is the msg class-id, an integer.
-    - *defaultMsgHandler* take one required parameter and one optional parameter, the first required parameter is the ubx payload or NMEA sentence, the second optional is only there for ubx messages and is the msg class-id, an integer.
-    - *nmeaMsgHandler* takes one required parameter, the NMEA sentence.
-    - ubx message specific handler, takes one required parameter ubx message payload.
+| Handler Name | Register Handler Type | Parameters | Parameter Description(s) |
+| --- | --- | --- | --- |
+| *defaultMsgHandler* | UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER | 1 required, 1 optional | first parameter (req): blob/string *payload/NMEA Sentence*, second parameter (opt): integer *class-id* |
+| *ubxMsgHandler* | UBLOX_M8N_CONST.UBX_MSG_HANDLER | 2 required | first parameter: blob *payload*, second parameter: integer *class-id* |
+| *nmeaMsgHandler* | UBLOX_M8N_CONST.NMEA_MSG_HANDLER | 1 required | first parameter: string *NMEA Sentence* |
+| *ubx message specific handler* | Integer: Message Class Id | 1 required  | first parameter: blob *payload* |
 
 #### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, baudrate]*) ####
 
