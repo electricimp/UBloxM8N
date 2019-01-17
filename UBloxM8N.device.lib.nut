@@ -298,10 +298,10 @@ class UBloxM8N {
      *
      * @param {string} entry - An assist entry string
      */
-    function writeAssist(entry) {
+    function writeMessage(entry) {
         if (_booting) {
             imp.wakeup(_bootTimeout, function() {
-                writeAssist(entry);
+                writeMessage(entry);
             }.bindenv(this))
             return;
         }

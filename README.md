@@ -130,6 +130,20 @@ Writes an NMEA protocol packet to the M8N.
 
 None.
 
+#### function writeMessage(*message*) ####
+
+Writes a message to the M8N. Message is written to uart, no headers, check sum etc are added.
+
+##### Parameters #####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *message* | blob/string | Yes | Message to write to M8N uart. |
+
+##### Return Value #####
+
+None.
+
 ## UbxMsgParser ##
 
 Parser for UBX binary messages. For information about UBX message  see [Reciever Description Including Protocol Specification document](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
