@@ -4,7 +4,7 @@ Electric Imp offers two libraries to support the UBLOX M8N GPS module: a device-
 
 ## UBloxM8N ##
 
-UART driver for UBLOX M8N GPS module.
+UART driver for u-blox M8N GPS module.
 
 **To add this library to your project, add** `#require "UBloxM8N.device.lib.nut:1.0.0"` **to the top of your device code.**
 
@@ -25,7 +25,7 @@ Handler Details:
 
 #### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, baudrate]*) ####
 
-Initializes Ublox M8N driver object. The constructor will initialize the specified hardware.uart object using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified in the Ublox data sheet).
+Initializes u-blox M8N driver object. The constructor will initialize the specified hardware.uart object using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified in the u-blox data sheet).
 
 ##### Parameters #####
 
@@ -33,7 +33,7 @@ Initializes Ublox M8N driver object. The constructor will initialize the specifi
 | --- | --- | --- | --- |
 | *uart* | string | Yes | An imp UART bus to which the GPS module is connected. |
 | *bootTimeoutSec* | integer/float | No | The time in seconds to wait after boot before the GPS is be ready for commands. Default is 1 sec. |
-| *baudrate* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the Ublox data sheet). |
+| *baudrate* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the u-blox data sheet). |
 
 ### Class Methods ###
 
@@ -45,7 +45,7 @@ Use this method to configure the uart baud rate, define the message type(s) the 
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *options* | table | Yes | A table of settings used to configure the UBLOX module *(see below)* |
+| *options* | table | Yes | A table of settings used to configure the u-blox module *(see below)* |
 
 The *options* table may contain any of the following keys:
 
