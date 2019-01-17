@@ -124,8 +124,8 @@ class UBloxM8N {
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
      *
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
-     * @param {integer} [classid] - UBX message class and id. All general and general UBX handlers will use
-     *      this parameter. UBX message specific handlers, and NMEA handlers do not need this parameter.
+     * @param {integer} [classid] - UBX message class and id. The defaultMsgHandler and general ubxMsgHandler will use
+     *      this parameter. UBX message specific handlers and NMEA handlers do not pass anything to this parameter.
      * @callback onMessageReceivedCallback
      */
     function configure(opts) {
@@ -215,7 +215,13 @@ class UBloxM8N {
      *
      * @param {integer} classid - the 2 byte message class and ID.
      * @param {integer} rate - how often, in seconds, new messages will be sent.
-     * @param {function} [handler] - handler for incoming messages of this type.
+     * @param {onMessageReceivedCallback} [handler] - handler for incoming messages of this type.
+     */
+    /**
+     * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
+     *
+     * @param {blob/string} payload - NMEA sentence or UBX message payload.
+     * @callback onMessageReceivedCallback
      */
     function enableUBXMsg(classid, rate, handler = null) {
         // Store handler

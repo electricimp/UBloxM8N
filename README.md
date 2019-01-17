@@ -12,9 +12,16 @@ UART driver for UBLOX M8N GPS module.
 
 #### Message Handlers ####
 
-When a valid message is received from the M8N it will be passed to a message handler if there is one. For any message only **one** handler will be triggered. If a message specific handler is available it will be used. If no message specific handler is available, the more general type specific *nmeaMsgHandler* or *ubxMsgHandler* will be used. If there are no message specific and no type specific handlers registered, then the *defaultMsgHandler* will be used. UBX messages will pass the message payload, a blob, as the first parameter, and the msg class-id, an integer, as the second paramter. NMEA messages will only use the first parameter and will pass the GPS sentence, a string, to the handler. To accomodate this the *defaultMsgHandler* must have an optional second parameter.
+When a valid message is received from the M8N it will be passed to a message handler if there is one. For any message only **one** handler will be triggered. If a message specific handler is available it will be used. If no message specific handler is available, the more general type specific *nmeaMsgHandler* or *ubxMsgHandler* will be used. If there are no message specific and no type specific handlers registered, then the *defaultMsgHandler* will be used.
 
-#### Constructor: GPSUARTDriver(uart[, bootTimeoutSec][, baudrate]) ####
+Handler parameters:
+
+    - *ubxMsgHandler* take 2 required parameters, the first is payload the second is the msg class-id, an integer.
+    - *defaultMsgHandler* take one required parameter and one optional parameter, the first required parameter is the ubx payload or NMEA sentence, the second optional is only there for ubx messages and is the msg class-id, an integer.
+    - *nmeaMsgHandler* takes one required parameter, the NMEA sentence.
+    - ubx message specific handler, takes one required parameter ubx message payload.
+
+#### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, baudrate]*) ####
 
 Initializes Ublox M8N driver object. The constructor will initialize the specified hardware.uart object using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified in the Ublox data sheet).
 
@@ -28,7 +35,7 @@ Initializes Ublox M8N driver object. The constructor will initialize the specifi
 
 ### Class Methods ###
 
-#### configure(options) ####
+#### configure(*options*) ####
 
 Use this method to configure the uart baud rate, define the message type(s) the M8N will accept, define the message type(s) the M8N will send, and to set default message handlers for incoming messages from the M8N. **Note:** This method will re-configure the uart bus.
 
@@ -61,7 +68,7 @@ Input/Output Mode Selector Options:
 
 None.
 
-#### enableUBXMsg(classid, rate[, handler]) ####
+#### enableUBXMsg(*classid, rate[, handler]*) ####
 
 Enables the specified UBX messages to be received at the specified rate interval. When messages are received they will be passed to the handler. If no handler is specified messages will be passed to a default handler instead. **Note:** To disable UBX msgs send the enable command a second time.
 
@@ -77,7 +84,7 @@ Enables the specified UBX messages to be received at the specified rate interval
 
 None.
 
-#### registerMsgHandler(type, handler) ####
+#### registerMsgHandler(*type, handler*) ####
 
 Registers a message handler for incoming messages from the M8N.
 
@@ -92,7 +99,7 @@ Registers a message handler for incoming messages from the M8N.
 
 None.
 
-#### writeUBX(classid, payload) ####
+#### writeUBX(*classid, payload*) ####
 
 Writes a UBX protocol packet to the M8N. Note if your command expects a response be sure you have a handler registered.
 
@@ -107,7 +114,7 @@ Writes a UBX protocol packet to the M8N. Note if your command expects a response
 
 None.
 
-#### function writeNMEA(sentence) ####
+#### function writeNMEA(*sentence*) ####
 
 Writes an NMEA protocol packet to the M8N.
 
@@ -130,7 +137,7 @@ This parser is a table, so it can be easily expanded. A small number of messages
 
 ### Class Methods ###
 
-#### 0x0107 (payload) ####
+#### 0x0107 (*payload*) ####
 
 Parses `0x0107` (NAV_PVT) UBX message payload.
 
@@ -199,7 +206,7 @@ Fix Status Flags
 | *confirmedDate* | integer | 1 = UTC Date validity could be confirmed. |
 | *confirmedTime* | integer | 1 = UTC Time of Day could be confirmed. |
 
-#### 0x0135 (payload) ####
+#### 0x0135 (*payload*) ####
 
 Parses `0x0135` (NAV_SAT) UBX message payload.
 
@@ -253,7 +260,7 @@ Satellite Info Flags
 | *crCorrUsed* | integer | 1 = Carrier range corrections have been used. |
 | *doCorrUsed* | integer | 1 = Range rate (Doppler) corrections have been used. |
 
-#### 0x0501 (payload) ####
+#### 0x0501 (*payload*) ####
 
 Parses `0x0501` (ACK_ACK) UBX message payload.
 
@@ -267,7 +274,7 @@ Parses `0x0501` (ACK_ACK) UBX message payload.
 
 An integer, the 2 byte message class and ID for the ACK-ed message.
 
-#### 0x0500 (payload) ####
+#### 0x0500 (*payload*) ####
 
 Parses `0x0500` (ACK_NAK) UBX message payload.
 
@@ -281,7 +288,7 @@ Parses `0x0500` (ACK_NAK) UBX message payload.
 
 An integer, the 2 byte message class and ID for the NAK-ed message.
 
-#### 0x0a04 (payload) ####
+#### 0x0a04 (*payload*) ####
 
 Parses `0x0a04` (MON_VER) UBX message payload.
 
@@ -301,7 +308,7 @@ A table.
 | *hwVersion* | sting | Hardware Version. |
 | *exSwInfo* | array | Array of extended software info strings, if any. |
 
-#### 0x0a09 (payload) ####
+#### 0x0a09 (*payload*) ####
 
 Parses `0x0a09` (MON_HW) UBX message payload.
 
@@ -342,7 +349,7 @@ Flags Table
 | *jammingState* | integer | output from Jamming/Interference Monitor: 0 = unknown or feature disabled, 1 = ok - no significant jamming, 2 = warning - interference visible but fix OK, 3 = critical - interference visible and no fix. |
 | *xtalAbsent* | integer | RTC xtal has been determined to be absent. (not supported in protocol versions less than 18). |
 
-#### 0x1360 (payload) ####
+#### 0x1360 (*payload*) ####
 
 Parses `0x1360` (MGA_ACK) UBX message payload.
 
