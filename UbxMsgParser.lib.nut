@@ -53,7 +53,7 @@ UbxMsgParser <- {
 }
 
 /**
- * @typedef {table} ValidityFlags
+ * @typedef {table} UBX_NAV_PVT::ValidityFlags
  * @property {bool} validDate - valid UTC Date
  * @property {bool} validTime - valid UTC Time of Day
  * @property {bool} fullyResolved - UTC Time of Day has been fully resolved (no seconds uncertainty)
@@ -61,7 +61,7 @@ UbxMsgParser <- {
  */
 
 /**
- * @typedef {table} fixStatusFlags
+ * @typedef {table} UBX_NAV_PVT::fixStatusFlags
  * @property {integer} gnssFixOK - 1 = valid fix (i.e within DOP & accuracy masks)
  * @property {integer} diffSoln - 1 = differential corrections were applied
  * @property {integer} psmState - Power Save Mode state: 0 = PSM is not active,
@@ -80,7 +80,7 @@ UbxMsgParser <- {
  */
 
 /**
- * @typedef {table} UBX_NAV_PVT_Message
+ * @typedef {table} UBX_NAV_PVT
  * @property {blob} iTOW - 4 byte unsigened integer, GPS time of week of the navigation epoch in ms.
  * @property {integer} year - Year (UTC)
  * @property {integer} month - Month, range 1..12 (UTC)
@@ -88,12 +88,12 @@ UbxMsgParser <- {
  * @property {integer} hour - Hour of day, range 0..23 (UTC)
  * @property {integer} min - Minute of hour, range 0..59 (UTC)
  * @property {integer} sec - Seconds of minute, range 0..60 (UTC)
- * @property {ValidityFlags} valid - Validity flags
+ * @property {UBX_NAV_PVT::ValidityFlags} valid - Validity flags
  * @property {integer} tAcc - Time accuracy estimate in ns (UTC)
  * @property {integer} nano - Fraction of second, range -1e9 .. 1e9 in ns (UTC)
  * @property {integer} fixType - GNSSfix Type: 0 = no fix, 1 = dead reckoning only,
  *   2 = 2D-fix, 3 = 3D-fix, 4 = GNSS + dead reckoning combined, 5 = time only fix
- * @property {fixStatusFlags} fixStatusFlags - Fix status flags
+ * @property {UBX_NAV_PVT::fixStatusFlags} fixStatusFlags - Fix status flags table
  * @property {integer} numSV - Number of satellites used in Nav Solution
  * @property {integer} lon - Longitude in deg
  * @property {integer} lat - Latitude in deg
@@ -114,14 +114,13 @@ UbxMsgParser <- {
  * @property {integer} magDec - Magnetic declination in deg
  * @property {integer} magAcc - Magnetic declination accuracy in deg
  */
-//
 
 /**
  * Parses 0x0107 (NAV_PVT) UBX message payload.
  *
  * @param {blob} payload - parses 100 byte NAV_PVT message payload.
  *
- * @return {UBX_NAV_PVT_Message}
+ * @return {UBX_NAV_PVT}
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
     // 0x0107: Expected payload size = 92 Bytes
@@ -205,44 +204,54 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
 };
 
 /**
+ * @typedef {table} UBX_NAV_SAT::satInfo
+ * @property {integer} gnssId - GNSS identifier
+ * @property {integer} svId - Satellite identifier
+ * @property {integer} cno - Carrier to noise ratio (signal strength) in dBHz
+ * @property {integer} elev - Elevation (range: +/-90), unknown if out of range, in deg
+ * @property {integer} azim - Azimuth (range 0-360), unknown if elevation is out of range, in deg
+ * @property {integer} prRes - Pseudorange residual in m
+ */
+
+/**
+ * @typedef {table} UBX_NAV_SAT::satInfo::flags
+ * @property {integer} qualityInd - Signal quality indicator: 0 = no signal, 1 = searching
+ *     signal, 2 = signal acquired, 3 = signal detected but unusable, 4 = code locked and
+ *     time synchronized, 5, 6, 7 = code and carrier locked and time synchronized
+ * @property {integer} svUsed - 1 = Signal in the subset specified in Signal Identifiers is
+ *     currently being used for navigation
+ * @property {integer} health - Signal health flag: 0 = unknown, 1 = healthy, 2 = unhealthy
+ * @property {integer} diffCorr - 1 = differential correction data is available for this SV
+ * @property {integer} smoothed - 1 = carrier smoothed pseudorange used
+ * @property {integer} orbitSource - Orbit source: 0 = no orbit information is available for
+ *     this SV, 1 = ephemeris is used, 2 = almanac is used, 3: AssistNow Offline orbit is used,
+ *     4 = AssistNow Autonomous orbit is used, 5, 6, 7: other orbit information is used
+ * @property {integer} ephAvail - 1 = ephemeris is available for this SV
+ * @property {integer} almAvail - 1 = almanac is available for this SV
+ * @property {integer} anoAvail - 1 = AssistNow Offline data is available for this SV
+ * @property {integer} aopAvail - 1 = AssistNow Autonomous data is available for this SV
+ * @property {integer} sbasCorrUsed - 1 = SBAS corrections have been used for a signal
+ * @property {integer} rtcmCorrUsed - 1 = RTCM corrections have been used
+ * @property {integer} slasCorrUsed - 1 = QZSS SLAS corrections have been used
+ * @property {integer} prCorrUsed - 1 = Pseudorange corrections have been used
+ * @property {integer} crCorrUsed - 1 = Carrier range corrections have been used
+ * @property {integer} doCorrUsed - 1 = Range rate (Doppler) corrections have been used
+ */
+
+/**
+ * @typedef {table} UBX_NAV_SAT
+ * @property {blob} iTOW - 4 byte unsigened integer, GPS time of week of the navigation epoch in ms.
+ * @property {integer} version - Message version (1 for this version)
+ * @property {integer} numSvs - Number of satellites
+ * @property {satInfo[]} satInfo - Array of satInfo tables
+ */
+
+/**
  * Parses 0x0135 (NAV_SAT) UBX message payload.
  *
  * @param {blob} payload - parses 8 + 12*n bytes NAV_SAT message payload.
  *
- * @return {table}
- *      @tableEntry {blob} iTOW - 4 byte unsigened integer, GPS time of week of the navigation epoch in ms.
- *      @tableEntry {integer} version - Message version (1 for this version)
- *      @tableEntry {integer} numSvs - Number of satellites
- *      @tableEntry {object[]} satInfo - Array of satelite info tables
- *              {table} - Satelite info
- *                  @tableEntry {integer} gnssId - GNSS identifier
- *                  @tableEntry {integer} svId - Satellite identifier
- *                  @tableEntry {integer} cno - Carrier to noise ratio (signal strength) in dBHz
- *                  @tableEntry {integer} elev - Elevation (range: +/-90), unknown if out of range, in deg
- *                  @tableEntry {integer} azim - Azimuth (range 0-360), unknown if elevation is out of range, in deg
- *                  @tableEntry {integer} prRes - Pseudorange residual in m
- *                  @tableEntry {table} flags - table of flags
- *                      @tableEntry {integer} qualityInd - Signal quality indicator: 0 = no signal, 1 = searching
- *                          signal, 2 = signal acquired, 3 = signal detected but unusable, 4 = code locked and
- *                          time synchronized, 5, 6, 7 = code and carrier locked and time synchronized
- *                      @tableEntry {integer} svUsed - 1 = Signal in the subset specified in Signal Identifiers is
- *                          currently being used for navigation
- *                      @tableEntry {integer} health - Signal health flag: 0 = unknown, 1 = healthy, 2 = unhealthy
- *                      @tableEntry {integer} diffCorr - 1 = differential correction data is available for this SV
- *                      @tableEntry {integer} smoothed - 1 = carrier smoothed pseudorange used
- *                      @tableEntry {integer} orbitSource - Orbit source: 0 = no orbit information is available for
- *                          this SV, 1 = ephemeris is used, 2 = almanac is used, 3: AssistNow Offline orbit is used,
- *                          4 = AssistNow Autonomous orbit is used, 5, 6, 7: other orbit information is used
- *                      @tableEntry {integer} ephAvail - 1 = ephemeris is available for this SV
- *                      @tableEntry {integer} almAvail - 1 = almanac is available for this SV
- *                      @tableEntry {integer} anoAvail - 1 = AssistNow Offline data is available for this SV
- *                      @tableEntry {integer} aopAvail - 1 = AssistNow Autonomous data is available for this SV
- *                      @tableEntry {integer} sbasCorrUsed - 1 = SBAS corrections have been used for a signal
- *                      @tableEntry {integer} rtcmCorrUsed - 1 = RTCM corrections have been used
- *                      @tableEntry {integer} slasCorrUsed - 1 = QZSS SLAS corrections have been used
- *                      @tableEntry {integer} prCorrUsed - 1 = Pseudorange corrections have been used
- *                      @tableEntry {integer} crCorrUsed - 1 = Carrier range corrections have been used
- *                      @tableEntry {integer} doCorrUsed - 1 = Range rate (Doppler) corrections have been used
+ * @return {UBX_NAV_SAT}
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT] <- function(payload) {
     // 0x0135: Expected payload size = 8 + 12*n bytes
@@ -324,15 +333,19 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_NAK] <- function(payload) {
 };
 
 /**
+ * @typedef {table} UBX_MON_VER
+ * @property {string} swVersion - Software Version
+ * @property {string} hwVersion - Hardware Version
+ * @property {string} protver - Supported protocol version
+ * @property {strings[]} [exSwInfo] - Array of strings with extended software info, if any
+ */
+
+/**
  * Parses 0x0a04 (MON_VER) UBX message payload.
  *
  * @param {blob} payload - parses 40 + 30*n bytes MON_VER message payload.
  *
- * @return {table}
- *      @tableEntry {string} swVersion - Software Version
- *      @tableEntry {string} hwVersion - Hardware Version
- *      @tableEntry {string} protver - Supported protocol version
- *      @tableEntry {object[]} [exSwInfo] - Array of extended software info strings, if any
+ * @return {UBX_MON_VER}
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER] <- function(payload) {
     // 40 + 30*n bytes
@@ -371,37 +384,43 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER] <- function(payload) {
 };
 
 /**
+ * @typedef {table} UBX_MON_HW::flags
+ * @property {integer} rtcCalib - RTC is calibrated
+ * @property {integer} safeBoot - safeBoot mode: 0 = inactive, 1 = active
+ * @property {integer} jammingState - output from Jamming/Interference Monitor:
+ *      0 = unknown or feature disabled, 1 = ok - no significant jamming,
+ *      2 = warning - interference visible but fix OK,
+ *      3 = critical - interference visible and no fix
+ * @property {integer} xtalAbsent - RTC xtal has been determined to be absent.
+ *      (not supported in protocol versions less than 18)
+ */
+
+/**
+ * @typedef {table} UBX_MON_HW
+ * @property {blob} pinSel - Mask of Pins Set as Peripheral/PIO
+ * @property {blob} pinBank - Mask of Pins Set as Bank A/B
+ * @property {blob} pinDir - Mask of Pins Set as Input/Output
+ * @property {blob} pinVal - Mask of Pins Value Low/High
+ * @property {integer} noisePerMS - Noise Level as measured by the GPS Core
+ * @property {integer} agcCnt - AGC Monitor (counts SIGHI xor SIGLO, range 0 to 8191)
+ * @property {integer} aStatus - Status of the Antenna Supervisor State Machine:
+ *      0 = INIT, 1 = DONTKNOW, 2 = OK, 3 = SHORT, 4 = OPEN
+ * @property {integer} aPower - Current PowerStatus of Antenna: 0 = OFF, 1 = ON, 2 = DON'T KNOW
+ * @property {UBX_MON_HW::flags} flags - table of flags
+ * @property {blob} usedMask - Mask of Pins that are used by the Virtual Pin Manager
+ * @property {blob} vp - Array of Pin Mappings for each of the 17 Physical Pins
+ * @property {integer} jamInd - CW Jamming indicator, scaled: 0 = no CW jamming, 255 = strong CW jamming
+ * @property {blob} pinIrq - Mask of Pins Value using the PIO Irq
+ * @property {blob} pullH - Mask of Pins Value using the PIO Pull High Resistor
+ * @property {blob} pullL - Mask of Pins Value using the PIO Pull Low Resistor
+ */
+
+/**
  * Parses 0x0a09 (MON_HW) UBX message payload.
  *
  * @param {blob} payload - parses 60 bytes MON_HW message payload.
  *
- * @return {table}
- *      @tableEntry {blob} pinSel - Mask of Pins Set as Peripheral/PIO
- *      @tableEntry {blob} pinBank - Mask of Pins Set as Bank A/B
- *      @tableEntry {blob} pinDir - Mask of Pins Set as Input/Output
- *      @tableEntry {blob} pinVal - Mask of Pins Value Low/High
- *      @tableEntry {integer} noisePerMS - Noise Level as measured by the GPS Core
- *      @tableEntry {integer} agcCnt - AGC Monitor (counts SIGHI xor SIGLO, range 0 to 8191)
- *      @tableEntry {integer} aStatus - Status of the Antenna Supervisor State Machine:
- *          0 = INIT, 1 = DONTKNOW, 2 = OK, 3 = SHORT, 4 = OPEN
- *      @tableEntry {integer} aPower - Current PowerStatus of Antenna: 0 = OFF, 1 = ON,
- *          2 = DON'T KNOW
- *      @tableEntry {table} flags -
- *              @tableEntry {integer} rtcCalib - RTC is calibrated
- *              @tableEntry {integer} safeBoot - safeBoot mode: 0 = inactive, 1 = active
- *              @tableEntry {integer} jammingState - output from Jamming/Interference Monitor:
- *                  0 = unknown or feature disabled, 1 = ok - no significant jamming,
- *                  2 = warning - interference visible but fix OK,
- *                  3 = critical - interference visible and no fix
- *              @tableEntry {integer} xtalAbsent - RTC xtal has been determined to be absent.
- *                  (not supported in protocol versions less than 18)
- *      @tableEntry {blob} usedMask - Mask of Pins that are used by the Virtual Pin Manager
- *      @tableEntry {blob} vp - Array of Pin Mappings for each of the 17 Physical Pins
- *      @tableEntry {integer} jamInd - CW Jamming indicator, scaled: 0 = no CW jamming,
- *              255 = strong CW jamming
- *      @tableEntry {blob} pinIrq - Mask of Pins Value using the PIO Irq
- *      @tableEntry {blob} pullH - Mask of Pins Value using the PIO Pull High Resistor
- *      @tableEntry {blob} pullL - Mask of Pins Value using the PIO Pull Low Resistor
+ * @return {UBX_MON_HW}
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
     // 0x0a09: Expected payload size = 60 bytes
@@ -436,26 +455,29 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
 };
 
 /**
+ * @typedef {table} UBX_MGA_ACK
+ * @property {integer} type - Type of acknowledgment: 0 = The message was not
+ *      used by the receiver (see infoCode field for an indication of why), 1 = The
+ *      message was accepted for use by the receiver (the infoCode field will be 0)
+ * @property {integer} version - Message version (0x00 for this version)
+ * @property {integer} infoCode - Provides greater information on what the
+ *      receiver chose to do with the message contents: 0 = The receiver accepted
+ *      the data, 1 = The receiver doesn't know the time so can't use the data
+ *      (To resolve this a UBX-MGA-INITIME_UTC message should be supplied first),
+ *      2 = The message version is not supported by the receiver, 3 = The message
+ *      size does not match the message version, 4 = The message data could not be
+ *      stored to the database, 5 = The receiver is not ready to use the message
+ *      data, 6 = The message type is unknown
+ * @property {integer} msgId - UBX message ID of the ack'ed message
+ * @property {blob} msgPayloadStart - The first 4 bytes of the ack'ed message's payload
+ */
+
+/**
  * Parses 0x1360 (MGA_ACK) UBX message payload.
  *
  * @param {blob} payload - parses 8 bytes bytes MGA_ACK message payload.
  *
- * @return {table}
- *      @tableEntry {integer} type - Type of acknowledgment: 0 = The message was not
- *          used by the receiver (see infoCode field for an indication of why), 1 = The
- *          message was accepted for use by the receiver (the infoCode field will be 0)
- *      @tableEntry {integer} version - Message version (0x00 for this version)
- *      @tableEntry {integer} infoCode - Provides greater information on what the
- *          receiver chose to do with the message contents: 0 = The receiver accepted
- *          the data, 1 = The receiver doesn't know the time so can't use the data
- *          (To resolve this a UBX-MGA-INITIME_UTC message should be supplied first),
- *          2 = The message version is not supported by the receiver, 3 = The message
- *          size does not match the message version, 4 = The message data could not be
- *          stored to the database, 5 = The receiver is not ready to use the message
- *          data, 6 = The message type is unknown
- *      @tableEntry {integer} msgId - UBX message ID of the ack'ed message
- *      @tableEntry {blob} msgPayloadStart - The first 4 bytes of the ack'ed message's
- *          payload
+ * @return {UBX_MGA_ACK}
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK] <- function(payload) {
     // 0x1360: Expected payload size = 8 bytes

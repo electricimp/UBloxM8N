@@ -95,7 +95,7 @@ Registers a message onMessage callback for incoming messages from the M8N.
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | *type* | string/integer | Yes | Either the UBX 2 byte message class and Id, or one of the following onMessage callback types: UBLOX_M8N_CONST.DEFAULT_ON_MSG, UBLOX_M8N_CONST.ON_NMEA_MSG, UBLOX_M8N_CONST.ON_UBX_MSG |
-| *onMessage* | function | Yes | A onMessage callback for incoming messages of this type. *(see onMessage Callback above)* |
+| *onMessage* | function | Yes | A callback for incoming messages of this type. *(see onMessage Callback above)* |
 
 ##### Return Value #####
 
