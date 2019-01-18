@@ -10,20 +10,20 @@ UART driver for u-blox M8N GPS module.
 
 ### Class Usage ###
 
-#### Message Handlers ####
+#### onMessage Callback ####
 
-When a valid message is received from the M8N it will be passed to a message handler if there is one. For any message only **one** handler will be triggered. If a message specific handler is available it will be used. If no message specific handler is available, the more general type specific *nmeaMsgHandler* or *ubxMsgHandler* will be used. If there are no message specific and no type specific handlers registered, then the *defaultMsgHandler* will be used.
+When a valid message is received from the M8N it will be passed to an onMessage callback if there is one. For any message only **one** callback will be triggered. If a message specific callback is available it will be used. If no message specific callback is available, the more general type specific *onNmeaMsg* or *onUbxMsg* will be used. If there are no message specific and no type specific handlers registered, then the *defaultOnMsg* will be used.
 
-Handler Details:
+Callback Function Details:
 
-| Handler Name | Register Handler Type | Parameters | Parameter Description(s) |
+| Callback Name | Register Callback Type | Parameters | Parameter Description(s) |
 | --- | --- | --- | --- |
-| *defaultMsgHandler* | UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER | 1 required, 1 optional | first parameter (req): blob/string *payload/NMEA Sentence*, second parameter (opt): integer *class-id* |
-| *ubxMsgHandler* | UBLOX_M8N_CONST.UBX_MSG_HANDLER | 2 required | first parameter: blob *payload*, second parameter: integer *class-id* |
-| *nmeaMsgHandler* | UBLOX_M8N_CONST.NMEA_MSG_HANDLER | 1 required | first parameter: string *NMEA Sentence* |
+| *defaultOnMsg* | UBLOX_M8N_CONST.DEFAULT_ON_MSG | 1 required, 1 optional | first parameter (req): blob/string *payload/NMEA Sentence*, second parameter (opt): integer *class-id* |
+| *onUbxMsg* | UBLOX_M8N_CONST.ON_UBX_MSG | 2 required | first parameter: blob *payload*, second parameter: integer *class-id* |
+| *onNmeaMsg* | UBLOX_M8N_CONST.ON_NMEA_MSG | 1 required | first parameter: string *NMEA Sentence* |
 | *ubx message specific handler* | Integer: Message Class Id | 1 required  | first parameter: blob *payload* |
 
-#### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, bootBaudRate]*) ####
+#### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, baudRateAtBoot]*) ####
 
 Initializes u-blox M8N driver object. The constructor will initialize the specified hardware.uart object using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified in the u-blox data sheet).
 
@@ -33,7 +33,7 @@ Initializes u-blox M8N driver object. The constructor will initialize the specif
 | --- | --- | --- | --- |
 | *uart* | string | Yes | An imp UART bus to which the GPS module is connected. |
 | *bootTimeoutSec* | integer/float | No | The time in seconds to wait after boot before the GPS is be ready for commands. Default is 1 sec. |
-| *bootBaudRate* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the u-blox data sheet). |
+| *baudRateAtBoot* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the u-blox data sheet). |
 
 ### Class Methods ###
 
@@ -54,9 +54,9 @@ The *options* table may contain any of the following keys:
 | *baudRate* | integer | The currently configured baud rate | The baud rate used to configure the UART |
 | *outputMode* | integer | UBLOX_M8N_MSG_MODE.BOTH  | Use the enum UBLOX_M8N_MSG_MODE to select the output message format type(s) *(see below)* |
 | *inputMode* | integer | UBLOX_M8N_MSG_MODE.BOTH | Use the enum UBLOX_M8N_MSG_MODE to select the input message format type(s) *(see below)* |
-| *nmeaMsgHandler* | function | `null` | A callback function that is triggered when an NMEA sentence is received. *(see Message Handlers above)* |
-| *ubxMsgHandler* | function | `null` | A callback function that is triggered when an UBX message is received, if no message specific handler is defined. *(see Message Handlers above)* |
-| *defaultMsgHandler* | function | `null` | A callback function that is triggered when any fully formed NMEA sentence or UBX message is recieved from the M8N, if no other handler is defined for that message. *(see Message Handlers above)* |
+| *onNmeaMsg* | function | `null` | A callback function that is triggered when an NMEA sentence is received. *(see onMessage Callback above)* |
+| *onUbxMsg* | function | `null` | A callback function that is triggered when an UBX message is received, if no message specific handler is defined. *(see onMessage Callback above)* |
+| *defaultOnMsg* | function | `null` | A callback function that is triggered when any fully formed NMEA sentence or UBX message is recieved from the M8N, if no other handler is defined for that message. *(see onMessage Callback above)* |
 
 Input/Output Mode Selector Options:
 
@@ -70,32 +70,32 @@ Input/Output Mode Selector Options:
 
 None.
 
-#### enableUBXMsg(*classid, rate[, handler]*) ####
+#### toggleUbxMsg(*classId, rate[, onMessage]*) ####
 
-Enables the specified UBX messages to be received at the specified rate interval. When messages are received they will be passed to the handler. If no handler is specified messages will be passed to a default handler instead. **Note:** To disable UBX msgs send the enable command a second time.
+Enables/Disables the UBX message at the specified rate. When messages are received they will be passed to the onMessage callback. If no onMessage callback is specified messages will be passed to either onUbxMsg or defaultOnMsg callback instead.
 
 ##### Parameters #####
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *classid* | integer | Yes | The 2 byte message class and ID. |
+| *classId* | integer | Yes | The 2 byte message class and Id. |
 | *rate* | integer | Yes | How often, in seconds, new messages should be sent. |
-| *handler* | function | No | A handler for incoming messages with this class-ID. If no handler is specified one of the generic message handlers will be used. *(see Message Handlers above)* |
+| *onMessage* | function | No | A callback function for incoming messages with this class-Id. If no callback is specified one of the more general onMessage callbacks will be used. *(see onMessage Callback above)* |
 
 ##### Return Value #####
 
 None.
 
-#### registerMsgHandler(*type, handler*) ####
+#### registerOnMessageCallback(*type, onMessage*) ####
 
-Registers a message handler for incoming messages from the M8N.
+Registers a message onMessage callback for incoming messages from the M8N.
 
 ##### Parameters #####
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *type* | string/integer | Yes | Either the UBX 2 byte message class and ID, or one of the following handler types: UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER, UBLOX_M8N_CONST.NMEA_MSG_HANDLER, UBLOX_M8N_CONST.UBX_MSG_HANDLER |
-| *handler* | function | Yes | A handler for incoming messages of this type. *(see Message Handlers above)* |
+| *type* | string/integer | Yes | Either the UBX 2 byte message class and ID, or one of the following onMessage callback types: UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER, UBLOX_M8N_CONST.NMEA_MSG_HANDLER, UBLOX_M8N_CONST.UBX_MSG_HANDLER |
+| *onMessage* | function | Yes | A onMessage callback for incoming messages of this type. *(see onMessage Callback above)* |
 
 ##### Return Value #####
 

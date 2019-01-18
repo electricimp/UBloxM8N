@@ -40,12 +40,13 @@ enum UBLOX_M8N_CONST {
     DEFAULT_UART_MODE        = 0x000008c0,  // 8 bit word size, parity none, stop bit 1
 
     DEFAULT_BOOT_TIMEOUT     = 1,
+    DEFAULT_CONFIG_WAIT      = 0.1,
 
     DEFAULT_PORT             = 0x01,
 
-    DEFAULT_MSG_HANDLER      = "default",
-    NMEA_MSG_HANDLER         = "nmea",
-    UBX_MSG_HANDLER          = "ubx",
+    DEFAULT_ON_MSG           = "default",
+    ON_NMEA_MSG              = "nmea",
+    ON_UBX_MSG               = "ubx",
 }
 
 enum UBLOX_M8N_MSG_MODE {
@@ -79,18 +80,20 @@ class UBloxM8N {
 
     /**
      * Initializes Ublox M8N driver object. The constructor will initialize the specified hardware.uart object
-     * using the either the specified baud rate or a default baud rate of 9600 (the default baud rate specified
+     * using either the specified baud rate or a default baud rate of 9600 (the default baud rate specified
      * in the Ublox data sheet).
      *
      * @constructor
      * @param {imp::uart} uart - An uninitialized imp API hardware.uart object that is connected to the M8N GPS module.
-     * @param {integer} [bootTimeoutSec] - Time in seconds to wait before sending commands to GPS after booting.
-     * @param {integer}  [bootBaudRate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE] - The baud rate used to configure the uart.
+     * @param {integer} [bootTimeoutSec = UBLOX_M8N_CONST.DEFAULT_BOOT_TIMEOUT] - Time in seconds to wait before sending
+     *      commands to GPS after booting.
+     * @param {integer}  [baudRateAtBoot = UBLOX_M8N_CONST.DEFUALT_BAUDRATE] - The baud rate the M8N boots at, used to
+     *      configure the imp uart.
      */
-    constructor(uart, bootTimeoutSec = UBLOX_M8N_CONST.DEFAULT_BOOT_TIMEOUT, bootBaudRate = UBLOX_M8N_CONST.DEFUALT_BAUDRATE) {
-        _currBaudRate = bootBaudRate;
+    constructor(uart, bootTimeoutSec = UBLOX_M8N_CONST.DEFAULT_BOOT_TIMEOUT, baudRateAtBoot = UBLOX_M8N_CONST.DEFUALT_BAUDRATE) {
+        _currBaudRate = baudRateAtBoot;
         _gpsuart = uart;
-        _gpsuart.configure(_currBaudRate, 8, PARITY_NONE, 1, NO_CTSRTS, _createUartHandler(UBLOX_M8N_MSG_MODE.BOTH));
+        _gpsuart.configure(_currBaudRate, 8, PARITY_NONE, 1, NO_CTSRTS, _createUartCallback(UBLOX_M8N_MSG_MODE.BOTH));
 
         _msgHandlers = {};
 
@@ -112,21 +115,21 @@ class UBloxM8N {
      *          should output.
      *      @tableEntry {UBLOX_M8N_MSG_MODE} [inputMode] - enum that specifies the type(s) of of input
      *          messages the M8N will accept.
-     *      @tableEntry {onMessageReceivedCallback} [nmeaMsgHandler] - handler for incoming NMEA messages from
+     *      @tableEntry {onMessageReceivedCallback} [onNmeaMsg] - handler for incoming NMEA messages from
      *          the M8N. All fully formed NMEA sentences from the M8N will be passed to this handler.
-     *      @tableEntry {onMessageReceivedCallback} [ubxMsgHandler] - handler for incoming UBX messages from the
+     *      @tableEntry {onMessageReceivedCallback} [onUbxMsg] - handler for incoming UBX messages from the
      *          M8N. All fully formed UBX packets from the M8N will be passed to this handler only if no message
      *          specific handler is defined.
-     *      @tableEntry {onMessageReceivedCallback} [defaultMsgHandler] - handler for all incoming messages from
+     *      @tableEntry {onMessageReceivedCallback} [defaultOnMsg] - handler for all incoming messages from
      *          the M8N. This handler is used only if a message has no other handlers defined.
      */
     /**
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
-     * @callback onMessageReceivedCallback
      *
+     * @callback onMessageReceivedCallback
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
-     * @param {integer} [classid] - UBX message class and id. The defaultMsgHandler and general ubxMsgHandler will use
-     *      this parameter. UBX message specific handlers and NMEA handlers do not pass anything to this parameter.
+     * @param {integer} [classId] - UBX message class and id. The defaultOnMsg and onUbxMsg will use this parameter.
+     *      UBX message specific handlers and NMEA handlers do not pass anything to this parameter.
      */
     function configure(opts) {
         if (_booting) {
@@ -139,9 +142,9 @@ class UBloxM8N {
         local baudrate = ("baudRate" in opts) ? opts.baudRate : UBLOX_M8N_CONST.DEFUALT_BAUDRATE;
         local output   = ("outputMode" in opts) ? opts.outputMode : UBLOX_M8N_MSG_MODE.BOTH;
         local input    = ("inputMode" in opts) ? opts.inputMode : UBLOX_M8N_MSG_MODE.BOTH;
-        if ("defaultMsgHandler" in opts)  _msgHandlers[UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER] <- opts.defaultMsgHandler;
-        if ("nmeaMsgHandler" in opts)  _msgHandlers[UBLOX_M8N_CONST.NMEA_MSG_HANDLER] <- opts.nmeaMsgHandler;
-        if ("ubxMsgHandler" in opts)  _msgHandlers[UBLOX_M8N_CONST.UBX_MSG_HANDLER] <- opts.ubxMsgHandler;
+        if ("defaultOnMsg" in opts)  _msgHandlers[UBLOX_M8N_CONST.DEFAULT_ON_MSG] <- opts.defaultOnMsg;
+        if ("onNmeaMsg" in opts)  _msgHandlers[UBLOX_M8N_CONST.ON_NMEA_MSG] <- opts.onNmeaMsg;
+        if ("onUbxMsg" in opts)  _msgHandlers[UBLOX_M8N_CONST.ON_UBX_MSG] <- opts.onUbxMsg;
 
         // We do not know input mode for sure
         if (_inputMode == null) {
@@ -149,12 +152,12 @@ class UBloxM8N {
             local nmeaCmd = format("%s,%i,%04x,%04x,%i,0", UBLOX_M8N_CONST.NMEA_CONFIG_MSG_HEADER, UBLOX_M8N_CONST.DEFAULT_PORT, input, output, _currBaudRate);
             writeNMEA(nmeaCmd);
             _gpsuart.flush();
-            imp.sleep(0.1);
+            imp.sleep(UBLOX_M8N_CONST.DEFAULT_CONFIG_WAIT);
 
             local ubxPayload = _getUbxCfgPrtPayload(_currBaudRate, input, output);
             writeUBX(UBLOX_M8N_CONST.UBX_CFG_PRT_CLASS_MSG_ID, ubxPayload);
             _gpsuart.flush();
-            imp.sleep(0.1);
+            imp.sleep(UBLOX_M8N_CONST.DEFAULT_CONFIG_WAIT);
         }
 
         if (_inputMode != null || baudrate != _currBaudRate) {
@@ -167,12 +170,12 @@ class UBloxM8N {
                 local nmeaCmd = format("%s,%i,%04x,%04x,%i,0", UBLOX_M8N_CONST.NMEA_CONFIG_MSG_HEADER, UBLOX_M8N_CONST.DEFAULT_PORT, input, output, _currBaudRate);
                 writeNMEA(nmeaCmd);
                 _gpsuart.flush();
-                imp.sleep(0.1);
+                imp.sleep(UBLOX_M8N_CONST.DEFAULT_CONFIG_WAIT);
             } else {
                 local ubxPayload = _getUbxCfgPrtPayload(_currBaudRate, input, output);
                 writeUBX(UBLOX_M8N_CONST.UBX_CFG_PRT_CLASS_MSG_ID, ubxPayload);
                 _gpsuart.flush();
-                imp.sleep(0.1);
+                imp.sleep(UBLOX_M8N_CONST.DEFAULT_CONFIG_WAIT);
             }
         } else {
             // We have already sent command, update stored setting
@@ -180,15 +183,15 @@ class UBloxM8N {
         }
 
         // Update UART with appropriate RX handler and/or baudrate
-        _gpsuart.configure(_currBaudRate, 8, PARITY_NONE, 1, NO_CTSRTS, _createUartHandler(_inputMode));
+        _gpsuart.configure(_currBaudRate, 8, PARITY_NONE, 1, NO_CTSRTS, _createUartCallback(_inputMode));
     }
 
     /**
      * Registers a message handlers for incoming messages from the M8N.
      *
      * @param {String/Integer} type - Either the UBX the 2 byte message class and ID, or one of the following
-     *      handler types: UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER, UBLOX_M8N_CONST.NMEA_MSG_HANDLER,
-     *      UBLOX_M8N_CONST.UBX_MSG_HANDLER
+     *      handler types: UBLOX_M8N_CONST.DEFAULT_ON_MSG, UBLOX_M8N_CONST.ON_NMEA_MSG,
+     *      UBLOX_M8N_CONST.ON_UBX_MSG
      * @param {onMessageReceivedCallback} handler - the function that is triggered when the specified message
      *      is received from the M8N. Note: only one handler will be triggered for each incoming message. If a
      *      message specific handler is registered that handler will be called. If no message specific handler
@@ -199,54 +202,54 @@ class UBloxM8N {
     /**
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
      *
-     * @param {blob/string} payload - NMEA sentence or UBX message payload.
-     * @param {integer} [classid] - UBX message class and id. All general and UBX handlers must include this
-     *      as an optional parameter. NMEA handlers do not need this parameter.
      * @callback onMessageReceivedCallback
+     * @param {blob/string} payload - NMEA sentence or UBX message payload.
+     * @param {integer} [classId] - UBX message class and id. All general and UBX handlers must include this
+     *      as an optional parameter. NMEA handlers do not need this parameter.
      */
-    function registerMsgHandler(type, handler) {
-        _msgHandlers[type] <- handler;
+    function registerOnMessageCallback(type, onMessage) {
+        _msgHandlers[type] <- onMessage;
     }
 
     /**
-     * Enables specified UBX messages at the specified interval. When messages are received they will be passed to the
-     * handler. If no handler is specified messages will be passed to a default handler instead. Note: To disable UBX
-     * msgs send the enable command a second time.
+     * Enables/Disables the UBX message at the specified rate. When messages are received they will be passed
+     * to the onMessage callback. If no onMessage callback is specified messages will be passed to either
+     * onUbxMsg or defaultOnMsg callback instead.
      *
-     * @param {integer} classid - the 2 byte message class and ID.
+     * @param {integer} classId - the 2 byte message class and Id.
      * @param {integer} rate - how often, in seconds, new messages will be sent.
-     * @param {onMessageReceivedCallback} [handler] - handler for incoming messages of this type.
+     * @param {onMessageReceivedCallback} [onMessage] - callback function for incoming messages with this class Id.
      */
     /**
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
      *
-     * @param {blob/string} payload - NMEA sentence or UBX message payload.
      * @callback onMessageReceivedCallback
+     * @param {blob/string} payload - NMEA sentence or UBX message payload.
      */
-    function enableUBXMsg(classid, rate, handler = null) {
+    function toggleUbxMsg(classId, rate, onMessage = null) {
         // Store handler
-        if (handler != null) _msgHandlers[classid] <- handler;
+        if (onMessage != null) _msgHandlers[classId] <- onMessage;
         // Send command to enable message
-        writeUBX(UBLOX_M8N_CONST.UBX_CFG_MSG_CLASS_MSG_ID, format("%c%c%c", classid >> 8, classid, rate));
+        writeUBX(UBLOX_M8N_CONST.UBX_CFG_MSG_CLASS_MSG_ID, format("%c%c%c", classId >> 8, classId, rate));
     }
 
     /**
      * Writes a UBX protocol packet to the M8N. Note if your command expects a response be sure you have a
      * handler registered.
      *
-     * @param {integer} classid - the 2 byte message class and ID.
+     * @param {integer} classId - the 2 byte message class and ID.
      * @param {blob/string} payload - the message payload.
      */
-    function writeUBX(classid, payload) {
+    function writeUBX(classId, payload) {
         if (_booting) {
             imp.wakeup(_bootTimeout, function() {
-                writeUBX(classid, payload);
+                writeUBX(classId, payload);
             }.bindenv(this))
             return;
         }
 
         // Form full packet
-        local pkt = format("%c%c%c%c", classid >> 8, classid & 0xFF, payload.len() & 0xFF, payload.len() >> 8) + payload;
+        local pkt = format("%c%c%c%c", classId >> 8, classId & 0xFF, payload.len() & 0xFF, payload.len() >> 8) + payload;
         local cs = _calcUbxChecksum(pkt);
 
         // Send header, packet, and checksum
@@ -274,19 +277,20 @@ class UBloxM8N {
 
         // Add check sum and/or ending characters if needed
         local astIdx = sentence.find("*");
-        if (astIdx == null) {
+
+        if (astIdx == null) /*No check sum in sentece, add one*/ {
             // Delete ending characters if there were any
             sentence = strip(sentence);
             // Add check sum and ending characters
             sentence = format("%s*%02x%c%c", sentence, _calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
-        } else if (astIdx == sentence.len() - 1) {
+        } else if (astIdx == sentence.len() - 1) /*Last char was *, need to add check sum*/ {
             // Add check sum and ending characters
             sentence = format("%s%02x%c%c", sentence, _calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
-        } else if (sentence.find(UBLOX_M8N_CONST.NMEA_END_CHAR_1.tochar()) == null || sentence.find(UBLOX_M8N_CONST.NMEA_END_CHAR_2.tochar()) == null) {
+        } else if (sentence.find(UBLOX_M8N_CONST.NMEA_END_CHAR_1.tochar()) == null || sentence.find(UBLOX_M8N_CONST.NMEA_END_CHAR_2.tochar()) == null) /*Sentence has check sum but is missing termination characters, add them*/ {
             // Delete ending characters if there were any
             sentence = strip(sentence);
             // Add correct ending characters
-            sentence = format("%s%c%c", sentence, _calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
+            sentence = format("%s%c%c", sentence, UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
         }
 
         // Send sentence
@@ -323,7 +327,7 @@ class UBloxM8N {
     }
 
     // Helper function that creates a UART callback based on the input message mode
-    function _createUartHandler(mode) {
+    function _createUartCallback(mode) {
         local processByte;
         switch(mode) {
             case UBLOX_M8N_MSG_MODE.NMEA_ONLY :
@@ -372,10 +376,10 @@ class UBloxM8N {
     function _processNMEA(b) {
         // Only process byte if we have a handler
         local handler = null;
-        if (UBLOX_M8N_CONST.NMEA_MSG_HANDLER in _msgHandlers) {
-            handler = _msgHandlers[UBLOX_M8N_CONST.NMEA_MSG_HANDLER];
-        } else if (UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER in _msgHandlers) {
-            handler = _msgHandlers[UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER];
+        if (UBLOX_M8N_CONST.ON_NMEA_MSG in _msgHandlers) {
+            handler = _msgHandlers[UBLOX_M8N_CONST.ON_NMEA_MSG];
+        } else if (UBLOX_M8N_CONST.DEFAULT_ON_MSG in _msgHandlers) {
+            handler = _msgHandlers[UBLOX_M8N_CONST.DEFAULT_ON_MSG];
         }
         if (handler == null) return;
 
@@ -465,21 +469,21 @@ class UBloxM8N {
 
         if (actualCheckSum == calcCheckSum) {
             // Packet is valid
-            local classid = (packet[0] << 8) | packet[1];
+            local classId = (packet[0] << 8) | packet[1];
             packet.seek(4, 'b');
             local payload = packet.readblob(bLen);
-            _processUBXPacket(classid, payload);
+            _processUBXPacket(classId, payload);
         }
     }
 
-    function _processUBXPacket(classid, payload) {
+    function _processUBXPacket(classId, payload) {
         // Handle packet based on class id
-        if (classid in _msgHandlers) {
-            _msgHandlers[classid](payload);
-        } else if (UBLOX_M8N_CONST.UBX_MSG_HANDLER in _msgHandlers) {
-            _msgHandlers[UBLOX_M8N_CONST.UBX_MSG_HANDLER](payload, classid);
-        } else if (UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER in _msgHandlers) {
-            _msgHandlers[UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER](payload, classid);
+        if (classId in _msgHandlers) {
+            _msgHandlers[classId](payload);
+        } else if (UBLOX_M8N_CONST.ON_UBX_MSG in _msgHandlers) {
+            _msgHandlers[UBLOX_M8N_CONST.ON_UBX_MSG](payload, classId);
+        } else if (UBLOX_M8N_CONST.DEFAULT_ON_MSG in _msgHandlers) {
+            _msgHandlers[UBLOX_M8N_CONST.DEFAULT_ON_MSG](payload, classId);
         }
     }
 
