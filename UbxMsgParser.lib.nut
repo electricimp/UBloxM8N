@@ -29,62 +29,75 @@ UbxMsgParser <- {
 }
 
 /**
+ * @typedef {table} ValidityFlags
+ * @property {bool} validDate - valid UTC Date
+ * @property {bool} validTime - valid UTC Time of Day
+ * @property {bool} fullyResolved - UTC Time of Day has been fully resolved (no seconds uncertainty)
+ * @property {bool} validMag - valid Magnetic declination
+ */
+
+/**
+ * @typedef {table} fixStatusFlags
+ * @property {integer} gnssFixOK - 1 = valid fix (i.e within DOP & accuracy masks)
+ * @property {integer} diffSoln - 1 = differential corrections were applied
+ * @property {integer} psmState - Power Save Mode state: 0 = PSM is not active,
+ *   1 = Enabled (an intermediate state before Acquisition state), 2 = Acquisition,
+ *   3 = Tracking, 4 = Power Optimized Tracking, 5 = Inactive
+ * @property {integer} headVehValid - 1 = heading of vehicle is valid
+ * @property {integer} carrSoln - Carrier phase range solution status (not supported in
+ *   protocol versions less than 20): 0: no carrier phase range solution, 1 = float
+ *   solution (no fixed integer carrier phase measurements have been used to calculate
+ *   the solution), 2 = fixed solution (one or more fixed integer carrier phase range
+ *   measurements have been used to calculate the solution)
+ * @property {integer} confirmedAvai - (Not supported in all versions) 1 = information
+ *   about UTC Date and Time of Day validity confirmation is available
+ * @property {integer} confirmedDate - 1 = UTC Date validity could be confirmed
+ * @property {integer} confirmedTime - 1 = UTC Time of Day could be confirmed
+ */
+
+/**
+ * @typedef {table} UBX_NAV_PVT_Message
+ * @property {blob} iTOW - 4 byte unsigened integer, GPS time of week of the navigation epoch in ms.
+ * @property {integer} year - Year (UTC)
+ * @property {integer} month - Month, range 1..12 (UTC)
+ * @property {integer} day - Day of month, range 1..31 (UTC)
+ * @property {integer} hour - Hour of day, range 0..23 (UTC)
+ * @property {integer} min - Minute of hour, range 0..59 (UTC)
+ * @property {integer} sec - Seconds of minute, range 0..60 (UTC)
+ * @property {ValidityFlags} valid - Validity flags
+ * @property {integer} tAcc - Time accuracy estimate in ns (UTC)
+ * @property {integer} nano - Fraction of second, range -1e9 .. 1e9 in ns (UTC)
+ * @property {integer} fixType - GNSSfix Type: 0 = no fix, 1 = dead reckoning only,
+ *   2 = 2D-fix, 3 = 3D-fix, 4 = GNSS + dead reckoning combined, 5 = time only fix
+ * @property {fixStatusFlags} fixStatusFlags - Fix status flags
+ * @property {integer} numSV - Number of satellites used in Nav Solution
+ * @property {integer} lon - Longitude in deg
+ * @property {integer} lat - Latitude in deg
+ * @property {integer} height - Height above ellipsoid in mm
+ * @property {integer} hMSL - Height above mean sea level mm
+ * @property {blob} hAcc - 4 byte unsigened integer, Horizontal accuracy estimate in mm
+ * @property {blob} vAcc - 4 byte unsigened integer, Vertical accuracy estimate in mm
+ * @property {integer} velN - NED north velocity in mm/s
+ * @property {integer} velE - NED east velocity in mm/s
+ * @property {integer} velD - NED down velocity in mm/s
+ * @property {integer} gSpeed - Ground Speed (2-D) in mm/s
+ * @property {integer} headMot - Heading of motion (2-D) in deg
+ * @property {blob} sAcc - 4 byte unsigened integer, Speed accuracy estimate in mm/s
+ * @property {blob} headAcc - 4 byte unsigened integer, Heading accuracy estimate (both
+ *   motion and vehicle) in mm/s
+ * @property {integer} pDOP - Position DOP
+ * @property {integer} headVeh - Heading of vehicle (2-D) in deg
+ * @property {integer} magDec - Magnetic declination in deg
+ * @property {integer} magAcc - Magnetic declination accuracy in deg
+ */
+//
+
+/**
  * Parses 0x0107 (NAV_PVT) UBX message payload.
  *
  * @param {blob} payload - parses 100 byte NAV_PVT message payload.
  *
- * @return {table}
- *      @tableEntry {blob} iTOW - 4 byte unsigened integer, GPS time of week of the navigation epoch in ms.
- *      @tableEntry {integer} year - Year (UTC)
- *      @tableEntry {integer} month - Month, range 1..12 (UTC)
- *      @tableEntry {integer} day - Day of month, range 1..31 (UTC)
- *      @tableEntry {integer} hour - Hour of day, range 0..23 (UTC)
- *      @tableEntry {integer} min - Minute of hour, range 0..59 (UTC)
- *      @tableEntry {integer} sec - Seconds of minute, range 0..60 (UTC)
- *      @tableEntry {table} valid - Validity flags
- *              @tableEntry {bool} validDate - valid UTC Date
- *              @tableEntry {bool} validTime - valid UTC Time of Day
- *              @tableEntry {bool} fullyResolved - UTC Time of Day has been fully resolved (no seconds uncertainty)
- *              @tableEntry {bool} validMag - valid Magnetic declination
- *      @tableEntry {integer} tAcc - Time accuracy estimate in ns (UTC)
- *      @tableEntry {integer} nano - Fraction of second, range -1e9 .. 1e9 in ns (UTC)
- *      @tableEntry {integer} fixType - GNSSfix Type: 0 = no fix, 1 = dead reckoning only,
- *          2 = 2D-fix, 3 = 3D-fix, 4 = GNSS + dead reckoning combined, 5 = time only fix
- *      @tableEntry {table} fixStatusFlags - Fix status flags
- *              @tableEntry {integer} gnssFixOK - 1 = valid fix (i.e within DOP & accuracy masks)
- *              @tableEntry {integer} diffSoln - 1 = differential corrections were applied
- *              @tableEntry {integer} psmState - Power Save Mode state: 0 = PSM is not active,
- *                  1 = Enabled (an intermediate state before Acquisition state), 2 = Acquisition,
- *                  3 = Tracking, 4 = Power Optimized Tracking, 5 = Inactive
- *              @tableEntry {integer} headVehValid - 1 = heading of vehicle is valid
- *              @tableEntry {integer} carrSoln - Carrier phase range solution status (not supported in
- *                  protocol versions less than 20): 0: no carrier phase range solution, 1 = float
- *                  solution (no fixed integer carrier phase measurements have been used to calculate
- *                  the solution), 2 = fixed solution (one or more fixed integer carrier phase range
- *                  measurements have been used to calculate the solution)
- *              @tableEntry {integer} confirmedAvai - (Not supported in all versions) 1 = information
- *                  about UTC Date and Time of Day validity confirmation is available
- *              @tableEntry {integer} confirmedDate - 1 = UTC Date validity could be confirmed
- *              @tableEntry {integer} confirmedTime - 1 = UTC Time of Day could be confirmed
- *      @tableEntry {integer} numSV - Number of satellites used in Nav Solution
- *      @tableEntry {integer} lon - Longitude in deg
- *      @tableEntry {integer} lat - Latitude in deg
- *      @tableEntry {integer} height - Height above ellipsoid in mm
- *      @tableEntry {integer} hMSL - Height above mean sea level mm
- *      @tableEntry {blob} hAcc - 4 byte unsigened integer, Horizontal accuracy estimate in mm
- *      @tableEntry {blob} vAcc - 4 byte unsigened integer, Vertical accuracy estimate in mm
- *      @tableEntry {integer} velN - NED north velocity in mm/s
- *      @tableEntry {integer} velE - NED east velocity in mm/s
- *      @tableEntry {integer} velD - NED down velocity in mm/s
- *      @tableEntry {integer} gSpeed - Ground Speed (2-D) in mm/s
- *      @tableEntry {integer} headMot - Heading of motion (2-D) in deg
- *      @tableEntry {blob} sAcc - 4 byte unsigened integer, Speed accuracy estimate in mm/s
- *      @tableEntry {blob} headAcc - 4 byte unsigened integer, Heading accuracy estimate (both
- *              motion and vehicle) in mm/s
- *      @tableEntry {integer} pDOP - Position DOP
- *      @tableEntry {integer} headVeh - Heading of vehicle (2-D) in deg
- *      @tableEntry {integer} magDec - Magnetic declination in deg
- *      @tableEntry {integer} magAcc - Magnetic declination accuracy in deg
+ * @return {UBX_NAV_PVT_Message}
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
     // 0x0107: Expected payload size = 92 Bytes
@@ -423,6 +436,7 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK] <- function(payload) {
     // 0x1360: Expected payload size = 8 bytes
     payload.seek(0, 'b');
+    // TODO: here and everywhere else probably it makes sense to check for length before we read
     return {
         "type"            : payload.readn('b'),
         "version"         : payload.readn('b'),
