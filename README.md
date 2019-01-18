@@ -12,7 +12,7 @@ UART driver for u-blox M8N GPS module.
 
 #### onMessage Callback ####
 
-When a valid message is received from the M8N it will be passed to an onMessage callback if there is one. For any message only **one** callback will be triggered. If a message specific callback is available it will be used. If no message specific callback is available, the more general type specific *onNmeaMsg* or *onUbxMsg* will be used. If there are no message specific and no type specific handlers registered, then the *defaultOnMsg* will be used.
+When a valid message is received from the M8N it will be passed to an onMessage callback if there is one. For any message only **one** callback will be triggered. If a message specific callback is available it will be used. If no message specific callback is available, the more general type specific *onNmeaMsg* or *onUbxMsg* will be used. If there are no message specific and no type specific callbacks registered, then the *defaultOnMsg* will be used.
 
 Callback Function Details:
 
@@ -21,7 +21,7 @@ Callback Function Details:
 | *defaultOnMsg* | UBLOX_M8N_CONST.DEFAULT_ON_MSG | 1 required, 1 optional | first parameter (req): blob/string *payload/NMEA Sentence*, second parameter (opt): integer *class-id* |
 | *onUbxMsg* | UBLOX_M8N_CONST.ON_UBX_MSG | 2 required | first parameter: blob *payload*, second parameter: integer *class-id* |
 | *onNmeaMsg* | UBLOX_M8N_CONST.ON_NMEA_MSG | 1 required | first parameter: string *NMEA Sentence* |
-| *ubx message specific handler* | Integer: Message Class Id | 1 required  | first parameter: blob *payload* |
+| *ubx message specific callback* | Integer: Message Class Id | 1 required  | first parameter: blob *payload* |
 
 #### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, baudRateAtBoot]*) ####
 
@@ -39,7 +39,7 @@ Initializes u-blox M8N driver object. The constructor will initialize the specif
 
 #### configure(*options*) ####
 
-Use this method to configure a new uart baud rate, define the message type(s) the M8N will accept, define the message type(s) the M8N will send, and to set default message handlers for incoming messages from the M8N. **Note:** This method will re-configure the uart bus.
+Use this method to configure a new uart baud rate, define the message type(s) the M8N will accept, define the message type(s) the M8N will send, and to set default message callbacks for incoming messages from the M8N. **Note:** This method will re-configure the uart bus.
 
 ##### Parameters #####
 
@@ -55,8 +55,8 @@ The *options* table may contain any of the following keys:
 | *outputMode* | integer | UBLOX_M8N_MSG_MODE.BOTH  | Use the enum UBLOX_M8N_MSG_MODE to select the output message format type(s) *(see below)* |
 | *inputMode* | integer | UBLOX_M8N_MSG_MODE.BOTH | Use the enum UBLOX_M8N_MSG_MODE to select the input message format type(s) *(see below)* |
 | *onNmeaMsg* | function | `null` | A callback function that is triggered when an NMEA sentence is received. *(see onMessage Callback above)* |
-| *onUbxMsg* | function | `null` | A callback function that is triggered when an UBX message is received, if no message specific handler is defined. *(see onMessage Callback above)* |
-| *defaultOnMsg* | function | `null` | A callback function that is triggered when any fully formed NMEA sentence or UBX message is recieved from the M8N, if no other handler is defined for that message. *(see onMessage Callback above)* |
+| *onUbxMsg* | function | `null` | A callback function that is triggered when an UBX message is received, if no message specific callback is defined. *(see onMessage Callback above)* |
+| *defaultOnMsg* | function | `null` | A callback function that is triggered when any fully formed NMEA sentence or UBX message is recieved from the M8N, if no other callback is defined for that message. *(see onMessage Callback above)* |
 
 Input/Output Mode Selector Options:
 
@@ -94,7 +94,7 @@ Registers a message onMessage callback for incoming messages from the M8N.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *type* | string/integer | Yes | Either the UBX 2 byte message class and ID, or one of the following onMessage callback types: UBLOX_M8N_CONST.DEFAULT_MSG_HANDLER, UBLOX_M8N_CONST.NMEA_MSG_HANDLER, UBLOX_M8N_CONST.UBX_MSG_HANDLER |
+| *type* | string/integer | Yes | Either the UBX 2 byte message class and Id, or one of the following onMessage callback types: UBLOX_M8N_CONST.DEFAULT_ON_MSG, UBLOX_M8N_CONST.ON_NMEA_MSG, UBLOX_M8N_CONST.ON_UBX_MSG |
 | *onMessage* | function | Yes | A onMessage callback for incoming messages of this type. *(see onMessage Callback above)* |
 
 ##### Return Value #####
@@ -103,7 +103,7 @@ None.
 
 #### writeUBX(*classid, payload*) ####
 
-Writes a UBX protocol packet to the M8N. Note if your command expects a response be sure you have a handler registered.
+Writes a UBX protocol packet to the M8N. Note if your command expects a response be sure you have a callback registered.
 
 ##### Parameters #####
 
