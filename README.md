@@ -21,7 +21,7 @@ Callback Function Details:
 | *defaultOnMsg* | UBLOX_M8N_CONST.DEFAULT_ON_MSG | 1 required, 1 optional | first parameter (req): blob/string *payload/NMEA Sentence*, second parameter (opt): integer *class-id* |
 | *onUbxMsg* | UBLOX_M8N_CONST.ON_UBX_MSG | 2 required | first parameter: blob *payload*, second parameter: integer *class-id* |
 | *onNmeaMsg* | UBLOX_M8N_CONST.ON_NMEA_MSG | 1 required | first parameter: string *NMEA Sentence* |
-| *ubx message specific callback* | Integer: Message Class Id | 1 required  | first parameter: blob *payload* |
+| *ubx message specific callback* | Message Class Id as an integer | 1 required  | first parameter: blob *payload* |
 
 #### Constructor: GPSUARTDriver(*uart[, bootTimeoutSec][, baudRateAtBoot]*) ####
 
@@ -31,9 +31,9 @@ Initializes u-blox M8N driver object. The constructor will initialize the specif
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *uart* | string | Yes | An imp UART bus to which the GPS module is connected. |
-| *bootTimeoutSec* | integer/float | No | The time in seconds to wait after boot before the GPS is be ready for commands. Default is 1 sec. |
-| *baudRateAtBoot* | integer | No | The default baud rate that the GPS boot's up in after cold boot. This defaults to 9600 (the default specified in the u-blox data sheet). |
+| *uart* | string | Yes | The imp UART bus that the M8N is connected to. |
+| *bootTimeoutSec* | integer/float | No | The time in seconds to wait after boot before commands are written to the M8N. Default is 1 sec. |
+| *baudRateAtBoot* | integer | No | The baud rate that the M8N will default to after a cold boot. This defaults to 9600 (the default specified in the u-blox data sheet). This should not need to be changed unless a different baud rate has been stored to the M8N's flash memory. |
 
 ### Class Methods ###
 
@@ -55,8 +55,8 @@ The *options* table may contain any of the following keys:
 | *outputMode* | integer | UBLOX_M8N_MSG_MODE.BOTH  | Use the enum UBLOX_M8N_MSG_MODE to select the output message format type(s) *(see below)* |
 | *inputMode* | integer | UBLOX_M8N_MSG_MODE.BOTH | Use the enum UBLOX_M8N_MSG_MODE to select the input message format type(s) *(see below)* |
 | *onNmeaMsg* | function | `null` | A callback function that is triggered when an NMEA sentence is received. *(see onMessage Callback above)* |
-| *onUbxMsg* | function | `null` | A callback function that is triggered when an UBX message is received, if no message specific callback is defined. *(see onMessage Callback above)* |
-| *defaultOnMsg* | function | `null` | A callback function that is triggered when any fully formed NMEA sentence or UBX message is recieved from the M8N, if no other callback is defined for that message. *(see onMessage Callback above)* |
+| *onUbxMsg* | function | `null` | A callback function that is triggered when an UBX message is received if no message specific callback is defined. *(see onMessage Callback above)* |
+| *defaultOnMsg* | function | `null` | A callback function that is triggered when any fully formed NMEA sentence or UBX message is recieved from the M8N if no other callbacks are defined for that message or message type. *(see onMessage Callback above)* |
 
 Input/Output Mode Selector Options:
 
@@ -78,7 +78,7 @@ Enables/Disables the UBX message at the specified rate. When messages are receiv
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *classId* | integer | Yes | The 2 byte message class and Id. |
+| *classId* | integer | Yes | The 2 byte message class and id. |
 | *rate* | integer | Yes | How often, in seconds, new messages should be sent. |
 | *onMessage* | function | No | A callback function for incoming messages with this class-Id. If no callback is specified one of the more general onMessage callbacks will be used. *(see onMessage Callback above)* |
 
@@ -94,14 +94,14 @@ Registers a message onMessage callback for incoming messages from the M8N.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *type* | string/integer | Yes | Either the UBX 2 byte message class and Id, or one of the following onMessage callback types: UBLOX_M8N_CONST.DEFAULT_ON_MSG, UBLOX_M8N_CONST.ON_NMEA_MSG, UBLOX_M8N_CONST.ON_UBX_MSG |
+| *type* | string/integer | Yes | Either the UBX 2 byte message class and id, or one of the following onMessage callback types: UBLOX_M8N_CONST.DEFAULT_ON_MSG, UBLOX_M8N_CONST.ON_NMEA_MSG, UBLOX_M8N_CONST.ON_UBX_MSG |
 | *onMessage* | function | Yes | A callback for incoming messages of this type. *(see onMessage Callback above)* |
 
 ##### Return Value #####
 
 None.
 
-#### writeUBX(*classid, payload*) ####
+#### writeUBX(*classId, payload*) ####
 
 Writes a UBX protocol packet to the M8N. Note if your command expects a response be sure you have a callback registered.
 
@@ -109,7 +109,7 @@ Writes a UBX protocol packet to the M8N. Note if your command expects a response
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *classid* | integer | Yes | The 2 byte message class and ID. |
+| *classId* | integer | Yes | The 2 byte message class and id. |
 | *payload* | blob/string | Yes | The message payload. |
 
 ##### Return Value #####
@@ -124,7 +124,7 @@ Writes an NMEA protocol packet to the M8N.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *sentence* | string | Yes | An NMEA formatted sentence with comma separated fields. If needed, this method will add the start character, ending characters, and the check sum to the sentence before writing. |
+| *sentence* | string | Yes | An NMEA formatted sentence with comma separated fields. This method will add the start character, ending characters, and the check sum to the sentence if needed before writing. |
 
 ##### Return Value #####
 
@@ -175,13 +175,17 @@ Integer, one byte check sum.
 ## UbxMsgParser ##
 
 Parser for UBX binary messages. For information about UBX message  see [Reciever Description Including Protocol Specification document](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
-This parser is a table, so it can be easily expanded. A small number of messages have been selected as a base. No initialization is needed. All slots in this table are the UBX the 2 byte message class and ID, and values are a function that takes the UBX message payload and returns the parsed payload. Parsed payloads are all tables, with the exception of ACK-ACK and ACK-NAK, which return the 2 byte message class and ID for the message being acknowleged. **Note:** Squirrel only supports signed 32 bit integers. If the paylaod conatins a 32 bit unsigned integer the parsed table will contain a 4 byte blob with the payload values. These values are in the same order as received by the M8N (little endian).
+This parser is a table, so command parsing functions can be added and customized. A small number of messages have been selected as a base. These commands are detailed in the *Class Methods* section below. No initialization is needed to use the parser's functions.
+
+All slots in this table are 2 byte integers, the UBX message class and id. The values for each slot are the parsing function. Each parsing function takes the UBX message payload and returns a table. The parsed tables will always contain an *error* and a *payload* slot. If no error was encountered when parsing the payload additional parameters will be included in the table. Users should always check the error parameter before accessing the other table slots.
+
+**Note:** Squirrel only supports signed 32 bit integers. If the paylaod conatins a 32 bit unsigned integer the parsed table will contain a 4 byte blob with the payload values. These values are in the same order as received by the M8N (little endian).
 
 **To add this library to your project, add** `#require "UbxMsgParser.lib.nut:1.0.0"` **to the top of your code.**
 
 ### Class Methods ###
 
-#### 0x0107 (*payload*) ####
+#### 0x0107(*payload*) ####
 
 Parses `0x0107` (NAV_PVT) UBX message payload.
 
@@ -197,6 +201,8 @@ A table.
 
 | Key | Type | Description |
 | --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
 | *iTOW* | blob | 4 byte unsigened integer, GPS time of week of the navigation epoch in ms. |
 | *year* | integer | Year (UTC). |
 | *month* | integer | Month, range 1..12 (UTC). |
@@ -250,7 +256,7 @@ Fix Status Flags
 | *confirmedDate* | integer | 1 = UTC Date validity could be confirmed. |
 | *confirmedTime* | integer | 1 = UTC Time of Day could be confirmed. |
 
-#### 0x0135 (*payload*) ####
+#### 0x0135(*payload*) ####
 
 Parses `0x0135` (NAV_SAT) UBX message payload.
 
@@ -266,6 +272,8 @@ A table.
 
 | Key | Type | Description |
 | --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
 | *iTOW* | blob | 4 byte unsigened integer, GPS time of week of the navigation epoch in ms. |
 | *version* | integer | Message version (1 for this version). |
 | *numSvs* | integer | Number of satellites. |
@@ -275,6 +283,8 @@ Satellite Info Tables
 
 | Key | Type | Description |
 | --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
 | *gnssId* | integer | GNSS identifier. |
 | *svId* | integer | Satellite identifier. |
 | *cno* | integer | Carrier to noise ratio (signal strength) in dBHz. |
@@ -287,6 +297,8 @@ Satellite Info Flags
 
 | Key | Type | Description |
 | --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
 | *qualityInd* | integer | Signal quality indicator: 0 = no signal, 1 = searching signal, 2 = signal acquired, 3 = signal detected but unusable, 4 = code locked and time synchronized, 5, 6, 7 = code and carrier locked and time synchronized. |
 | *svUsed* | integer | 1 = Signal in the subset specified in Signal Identifiers is currently being used for navigation. |
 | *health* | integer | Signal health flag: 0 = unknown, 1 = healthy, 2 = unhealthy. |
@@ -304,7 +316,7 @@ Satellite Info Flags
 | *crCorrUsed* | integer | 1 = Carrier range corrections have been used. |
 | *doCorrUsed* | integer | 1 = Range rate (Doppler) corrections have been used. |
 
-#### 0x0501 (*payload*) ####
+#### 0x0501(*payload*) ####
 
 Parses `0x0501` (ACK_ACK) UBX message payload.
 
@@ -316,9 +328,15 @@ Parses `0x0501` (ACK_ACK) UBX message payload.
 
 ##### Return Value #####
 
-An integer, the 2 byte message class and ID for the ACK-ed message.
+A table.
 
-#### 0x0500 (*payload*) ####
+| Key | Type | Description |
+| --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
+| *ackMsgClassId* | integer | the 2 byte message class and id of the ACK-ed message. |
+
+#### 0x0500(*payload*) ####
 
 Parses `0x0500` (ACK_NAK) UBX message payload.
 
@@ -330,9 +348,15 @@ Parses `0x0500` (ACK_NAK) UBX message payload.
 
 ##### Return Value #####
 
-An integer, the 2 byte message class and ID for the NAK-ed message.
+A table.
 
-#### 0x0a04 (*payload*) ####
+| Key | Type | Description |
+| --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
+| *nakMsgClassId* | integer | the 2 byte message class and id for the NAK-ed message. |
+
+#### 0x0a04(*payload*) ####
 
 Parses `0x0a04` (MON_VER) UBX message payload.
 
@@ -348,11 +372,13 @@ A table.
 
 | Key | Type | Description |
 | --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
 | *swVersion* | string | Software Version. |
 | *hwVersion* | sting | Hardware Version. |
 | *exSwInfo* | array | Array of extended software info strings, if any. |
 
-#### 0x0a09 (*payload*) ####
+#### 0x0a09(*payload*) ####
 
 Parses `0x0a09` (MON_HW) UBX message payload.
 
@@ -368,6 +394,8 @@ A table.
 
 | Key | Type | Description |
 | --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
 | *pinSel* | blob | Mask of Pins Set as Peripheral/PIO. |
 | *pinBank* | blob | Mask of Pins Set as Bank A/B. |
 | *pinDir* | blob | Mask of Pins Set as Input/Output. |
@@ -393,7 +421,7 @@ Flags Table
 | *jammingState* | integer | output from Jamming/Interference Monitor: 0 = unknown or feature disabled, 1 = ok - no significant jamming, 2 = warning - interference visible but fix OK, 3 = critical - interference visible and no fix. |
 | *xtalAbsent* | integer | RTC xtal has been determined to be absent. (not supported in protocol versions less than 18). |
 
-#### 0x1360 (*payload*) ####
+#### 0x1360(*payload*) ####
 
 Parses `0x1360` (MGA_ACK) UBX message payload.
 
@@ -409,6 +437,8 @@ A table.
 
 | Key | Type | Description |
 | --- | --- | --- |
+| *error* | string/null | Error message if parsing error was encountered or `null`. |
+| *payload* | blob | The unparsed payload. |
 | *type* | integer |Type of acknowledgment: 0 = The message was not used by the receiver (see infoCode field for an indication of why), 1 = The message was accepted for use by the receiver (the infoCode field will be 0). |
 | *version* | integer | Message version (0x00 for this version). |
 | *infoCode* | integer | Provides greater information on what the receiver chose to do with the message contents: 0 = The receiver accepted the data, 1 = The receiver doesn't know the time so can't use the data (To resolve this a UBX-MGA-INITIME_UTC message should be supplied first), 2 = The message version is not supported by the receiver, 3 = The message size does not match the message version, 4 = The message data could not be stored to the database, 5 = The receiver is not ready to use the message data, 6 = The message type is unknown. |
