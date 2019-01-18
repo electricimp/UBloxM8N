@@ -49,7 +49,20 @@ enum UBX_MSG_PARSER_CLASS_MSG_ID {
  * @table
  */
 UbxMsgParser <- {
-    "VERSION" : "1.0.0"
+    "VERSION" : "1.0.0",
+    "ERROR_UNEXPECTED_PAYLOAD_LEN" : "Error: Expected payload length %i, received payload with length %i",
+    "_getLenError" : function(payload, expected, expectedMin = null) {
+        local actual = payload.len();
+        local check = (expected == null) ? (actual >= expectedMin) : (actual == expected);
+        if (check) {
+            return null;
+        } else {
+            return {
+                "error" : format(ERROR_UNEXPECTED_PAYLOAD_LEN, expected, actual),
+                "payload" : payload
+            };
+        }
+    },
 }
 
 /**
@@ -124,6 +137,10 @@ UbxMsgParser <- {
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
     // 0x0107: Expected payload size = 92 Bytes
+    local expectedLen = 92;
+    local err = _getLenError(payload, expectedLen);
+    if (err != null) return err;
+
     payload.seek(0, 'b');
     local iTOW = payload.readblob(4);
     local year = payload.readn('w');
@@ -255,6 +272,10 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT] <- function(payload) {
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT] <- function(payload) {
     // 0x0135: Expected payload size = 8 + 12*n bytes
+    local expectedMin = 8;
+    local err = _getLenError(payload, null, expectedMin);
+    if (err != null) return err;
+
     payload.seek(0, 'b');
     local iTOW = payload.readblob(4);
     local parsed = {
@@ -315,6 +336,10 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT] <- function(payload) {
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_ACK] <- function(payload) {
     // 0x0501: Expected payload size = 2 bytes
+    local expected = 2;
+    local err = _getLenError(payload, expected);
+    if (err != null) return err;
+
     // Returns classid of ACK-ed msg
     return payload[0] << 4 | payload[1];
 };
@@ -328,6 +353,10 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_ACK] <- function(payload) {
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_NAK] <- function(payload) {
     // 0x0500: Expected payload size = 2 bytes
+    local expected = 2;
+    local err = _getLenError(payload, expected);
+    if (err != null) return err;
+
     // Returns classid of NAK-ed msg
     return payload[0] << 4 | payload[1];
 };
@@ -348,7 +377,11 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_NAK] <- function(payload) {
  * @return {UBX_MON_VER}
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER] <- function(payload) {
-    // 40 + 30*n bytes
+    // 0x0a04: Expected payload size = 40 + 30*n bytes
+    local expectedMin = 40;
+    local err = _getLenError(payload, null, expectedMin);
+    if (err != null) return err;
+
     payload.seek(0, 'b');
     local sw = payload.readstring(30);
     local last = sw.find("\x00");
@@ -424,6 +457,10 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER] <- function(payload) {
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
     // 0x0a09: Expected payload size = 60 bytes
+    local expected = 60;
+    local err = _getLenError(payload, expected);
+    if (err != null) return err;
+
     payload.seek(0, 'b');
     local parsed = {
         "pinSel"     : payload.readblob(4),
@@ -481,6 +518,10 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
  */
 UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK] <- function(payload) {
     // 0x1360: Expected payload size = 8 bytes
+    local expected = 8;
+    local err = _getLenError(payload, expected);
+    if (err != null) return err;
+
     payload.seek(0, 'b');
     // TODO: here and everywhere else probably it makes sense to check for length before we read
     return {
