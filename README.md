@@ -144,6 +144,34 @@ Writes a message to the M8N. Message is written to uart, no headers, check sum e
 
 None.
 
+#### function calcUbxChecksum(*packet*) ####
+
+Calculates the check sum for a UBX packet. Packet must consist of only the following: message class(1 byte), message id (1 byte), payload length (2 bytes), and payload.
+
+##### Parameters #####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *packet* | blob | Yes | Packet to calculate check sum on. |
+
+##### Return Value #####
+
+String, 2 byte check sum.
+
+#### function calcNMEACheckSum(*sentence*) ####
+
+Calculates the check sum for an NMEA sentence. This method will ignore starting and ending characters if they are in the sentence that is passed in.
+
+##### Parameters #####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *sentence* | string | Yes | Sentence to calculate check sum on. |
+
+##### Return Value #####
+
+Integer, one byte check sum.
+
 ## UbxMsgParser ##
 
 Parser for UBX binary messages. For information about UBX message  see [Reciever Description Including Protocol Specification document](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).

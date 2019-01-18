@@ -250,7 +250,7 @@ class UBloxM8N {
 
         // Form full packet
         local pkt = format("%c%c%c%c", classId >> 8, classId & 0xFF, payload.len() & 0xFF, payload.len() >> 8) + payload;
-        local cs = _calcUbxChecksum(pkt);
+        local cs = calcUbxChecksum(pkt);
 
         // Send header, packet, and checksum
         _gpsuart.write(format("%c%c", UBLOX_M8N_CONST.UBX_SYNC_CHAR_1, UBLOX_M8N_CONST.UBX_SYNC_CHAR_2));
@@ -282,10 +282,10 @@ class UBloxM8N {
             // Delete ending characters if there were any
             sentence = strip(sentence);
             // Add check sum and ending characters
-            sentence = format("%s*%02x%c%c", sentence, _calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
+            sentence = format("%s*%02x%c%c", sentence, calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
         } else if (astIdx == sentence.len() - 1) /*Last char was *, need to add check sum*/ {
             // Add check sum and ending characters
-            sentence = format("%s%02x%c%c", sentence, _calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
+            sentence = format("%s%02x%c%c", sentence, calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
         } else if (sentence.find(UBLOX_M8N_CONST.NMEA_END_CHAR_1.tochar()) == null || sentence.find(UBLOX_M8N_CONST.NMEA_END_CHAR_2.tochar()) == null) /*Sentence has check sum but is missing termination characters, add them*/ {
             // Delete ending characters if there were any
             sentence = strip(sentence);
@@ -312,6 +312,43 @@ class UBloxM8N {
 
         // Send entry
         _gpsuart.write(entry);
+    }
+
+    /**
+     * Calculates the check sum for a UBX packet.
+     *
+     * @param {blob} pkt - Packet must consist of only the following: message class(1 byte),
+     * message id (1 byte), payload length (2 bytes), and payload.
+     *
+     * @returns {string} 2 byte check sum
+     */
+    function calcUbxChecksum(pkt) {
+        local cka=0, ckb=0;
+        foreach(a in pkt) {
+            cka += a;
+            ckb += cka;
+        }
+        cka = cka & 0xFF;
+        ckb = ckb & 0xFF;
+
+        return format("%c%c", cka, ckb);
+    }
+
+    /**
+     * Calculates the check sum for an NMEA sentence. This method will exclude starting and
+     * ending characters when calculating the check sum.
+     *
+     * @param {string} sentence - NMEA sentence
+     *
+     * @returns {integer} 1 byte check sum
+     */
+    function calcNMEACheckSum(sentence) {
+        local check = 0;
+        local index = (sentence[0] == UBLOX_M8N_CONST.NMEA_START_CHAR) ? 1 : 0;
+        while(index < sentence.len() && sentence[index] != '*') {
+            check = check ^ (sentence[index++]);
+        }
+        return check;
     }
 
     // Helper function that creates a UBX CFG_PRT payload
@@ -465,7 +502,7 @@ class UBloxM8N {
         buff.seek(-2, 'e');
         local actualCheckSum = buff.readstring(2);
         // Calculate CheckSum of packet
-        local calcCheckSum = _calcUbxChecksum(packet);
+        local calcCheckSum = calcUbxChecksum(packet);
 
         if (actualCheckSum == calcCheckSum) {
             // Packet is valid
@@ -485,27 +522,6 @@ class UBloxM8N {
         } else if (UBLOX_M8N_CONST.DEFAULT_ON_MSG in _msgHandlers) {
             _msgHandlers[UBLOX_M8N_CONST.DEFAULT_ON_MSG](payload, classId);
         }
-    }
-
-    function _calcUbxChecksum(pkt) {
-        local cka=0, ckb=0;
-        foreach(a in pkt) {
-            cka += a;
-            ckb += cka;
-        }
-        cka = cka & 0xFF;
-        ckb = ckb & 0xFF;
-
-        return format("%c%c", cka, ckb);
-    }
-
-    function _calcNMEACheckSum(sentence) {
-        local check = 0;
-        local index = (sentence[0] == UBLOX_M8N_CONST.NMEA_START_CHAR) ? 1 : 0;
-        while(index < sentence.len() && sentence[index] != '*') {
-            check = check ^ (sentence[index++]);
-        }
-        return check;
     }
 
 }
