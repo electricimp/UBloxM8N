@@ -105,23 +105,26 @@ class UBloxM8N {
     }
 
     /**
+     * @typedef {table} ConfigOpts
+     * @property {integer} [baudRate] - an updated uart baud rate.
+     * @property {UBLOX_M8N_MSG_MODE} [outputMode] - enum that specifies the type(s) of messages the M8N
+     *      should output.
+     * @property {UBLOX_M8N_MSG_MODE} [inputMode] - enum that specifies the type(s) of of input
+     *      messages the M8N will accept.
+     * @property {onMessageReceivedCallback} [onNmeaMsg] - handler for incoming NMEA messages from
+     *      the M8N. All fully formed NMEA sentences from the M8N will be passed to this handler.
+     * @property {onMessageReceivedCallback} [onUbxMsg] - handler for incoming UBX messages from the
+     *      M8N. All fully formed UBX packets from the M8N will be passed to this handler only if no message
+     *      specific handler is defined.
+     * @property {onMessageReceivedCallback} [defaultOnMsg] - handler for all incoming messages from
+     *      the M8N. This handler is used only if a message has no other handlers defined.
+     */
+    /**
      * Configures the uart baud rate, defines the message type(s) the M8N will accept, defines the message type(s)
      * the M8N will send, and sets default message handlers for incoming messages from the M8N. This method will
      * re-configure the uart bus.
      *
-     * @param {table} opts - configuration options
-     *      @tableEntry {integer} [baudRate] - an updated uart baud rate.
-     *      @tableEntry {UBLOX_M8N_MSG_MODE} [outputMode] - enum that specifies the type(s) of messages the M8N
-     *          should output.
-     *      @tableEntry {UBLOX_M8N_MSG_MODE} [inputMode] - enum that specifies the type(s) of of input
-     *          messages the M8N will accept.
-     *      @tableEntry {onMessageReceivedCallback} [onNmeaMsg] - handler for incoming NMEA messages from
-     *          the M8N. All fully formed NMEA sentences from the M8N will be passed to this handler.
-     *      @tableEntry {onMessageReceivedCallback} [onUbxMsg] - handler for incoming UBX messages from the
-     *          M8N. All fully formed UBX packets from the M8N will be passed to this handler only if no message
-     *          specific handler is defined.
-     *      @tableEntry {onMessageReceivedCallback} [defaultOnMsg] - handler for all incoming messages from
-     *          the M8N. This handler is used only if a message has no other handlers defined.
+     * @param {ConfigOpts} opts - configuration options
      */
     /**
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
@@ -212,9 +215,9 @@ class UBloxM8N {
     }
 
     /**
-     * Enables/Disables the UBX message at the specified rate. When messages are received they will be passed
+     * Enable UBX messages at the specified rate. When messages are received they will be passed
      * to the onMessage callback. If no onMessage callback is specified messages will be passed to either
-     * onUbxMsg or defaultOnMsg callback instead.
+     * onUbxMsg or defaultOnMsg callback instead. To disable messages pass a rate of 0 to this method.
      *
      * @param {integer} classId - the 2 byte message class and Id.
      * @param {integer} rate - how often, in seconds, new messages will be sent.
@@ -226,7 +229,7 @@ class UBloxM8N {
      * @callback onMessageReceivedCallback
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
      */
-    function toggleUbxMsg(classId, rate, onMessage = null) {
+    function enableUbxMsg(classId, rate, onMessage = null) {
         // Store handler
         if (onMessage != null) _msgHandlers[classId] <- onMessage;
         // Send command to enable message
