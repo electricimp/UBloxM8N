@@ -28,6 +28,14 @@ This parser is a table, so command parsing functions can be added and customized
 
 Basic usage examples.
 
+[Documentation](./Examples/README.md)
+
+[UBX Location Code](./Examples/UBX_Location.device.nut)
+
+[NMEA Location Code](./Examples/NMEA_Location.device.nut)
+
+[General Location Code](./Examples/UBX_NMEA_Location.device.nut)
+
 ## License ##
 
 These libraries are licensed under the [MIT License](./LICENSE).
