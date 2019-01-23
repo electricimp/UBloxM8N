@@ -13,7 +13,7 @@ This example shows how to:
 - gets the module's software version by sending a raw command
 - parse and log messages received by the various callbacks
 
-[Code](./UBX_Location.device.nut)
+[Link to code](./UBX_Location.device.nut)
 
 ## NMEA Location ##
 
@@ -23,7 +23,7 @@ This example shows how to:
 - register both a default callback for NMEA messages
 - parse and log location data from an NMEA message
 
-[Code](./NMEA_Location.device.nut)
+[Link to code](./NMEA_Location.device.nut)
 
 ## UBX and NMEA Location ##
 
@@ -33,4 +33,4 @@ These examples shows how to:
 - use a single onMessage callback to process data
 - parse and log location data
 
-[Code](./UBX_NMEA_Location.device.nut)
+[Link to code](./UBX_NMEA_Location.device.nut)

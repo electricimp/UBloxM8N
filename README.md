@@ -2,7 +2,7 @@
 
 Electric Imp offers two libraries to support the UBLOX M8N GPS module: a device-side driver class, and a parser. The libraries are based on the commands as defined by [Reciever Description Including Protocol Specification document](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
 
-## UBloxM8N ##
+## [UBloxM8N](./Driver) ##
 
 UART driver for u-blox M8N GPS module.
 
@@ -12,7 +12,7 @@ UART driver for u-blox M8N GPS module.
 
 **To add this library to your project, add** `#require "UBloxM8N.device.lib.nut:1.0.0"` **to the top of your device code.**
 
-## UbxMsgParser ##
+## [UbxMsgParser](./Parser) ##
 
 Parser for UBX binary messages. For information about UBX message  see [Reciever Description Including Protocol Specification document](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
 
@@ -24,11 +24,9 @@ This parser is a table, so command parsing functions can be added and customized
 
 **To add this library to your project, add** `#require "UbxMsgParser.lib.nut:1.0.0"` **to the top of your code.**
 
-## Examples ##
+## [Examples](./Examples) ##
 
 These examples show how to use the UBloxM8N driver, with both the UbxMsgParser (for parsing UBX messages) and GPSParser (for parsing NMEA sentences). All examples run on the device only.
-
-[Basic usage examples summery](./Examples/README.md)
 
 [UBX Location Code](./Examples/UBX_Location.device.nut)
 
