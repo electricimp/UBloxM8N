@@ -196,11 +196,12 @@ class UBloxM8N {
      *      handler types: UBLOX_M8N_CONST.DEFAULT_ON_MSG, UBLOX_M8N_CONST.ON_NMEA_MSG,
      *      UBLOX_M8N_CONST.ON_UBX_MSG
      * @param {onMessageReceivedCallback} handler - the function that is triggered when the specified message
-     *      is received from the M8N. Note: only one handler will be triggered for each incoming message. If a
-     *      message specific handler is registered that handler will be called. If no message specific handler
-     *      is registered the UBX or NMEA message handlers will be used. If no matching handlers are register
-     *      the general message handler will be used. If a general message handler is registered it should be
-     *      able to handle both NMEA and UBX message formats.
+     *      is received from the M8N. Passing null to the onMessage will unregister the callback. Note: only
+     *      one handler will be triggered for each incoming message. If a message specific handler is
+     *      registered that handler will be called. If no message specific handler is registered the UBX or
+     *      NMEA message handlers will be used. If no matching handlers are register the general message
+     *      handler will be used. If a general message handler is registered it should be able to handle
+     *      both NMEA and UBX message formats.
      */
     /**
      * Callback to be executed when a fully formed NMEA sentence or UBX message is received from the M8N.
@@ -211,13 +212,17 @@ class UBloxM8N {
      *      as an optional parameter. NMEA handlers do not need this parameter.
      */
     function registerOnMessageCallback(type, onMessage) {
-        _msgHandlers[type] <- onMessage;
+        if (onMessage == null) {
+            if (type in _msgHandlers) _msgHandlers.rawdelete(type);
+        } else {
+            _msgHandlers[type] <- onMessage;
+        }
     }
 
     /**
      * Enable UBX messages at the specified rate. When messages are received they will be passed
      * to the onMessage callback. If no onMessage callback is specified messages will be passed to either
-     * onUbxMsg or defaultOnMsg callback instead. To disable messages pass a rate of 0 to this method.
+     * onUbxMsg or defaultOnMsg callback instead. To disable messages pass a rate of 0 to this method. If messages are disabled the callback will be deleted.
      *
      * @param {integer} classId - the 2 byte message class and Id.
      * @param {integer} rate - how often, in seconds, new messages will be sent.
@@ -230,8 +235,14 @@ class UBloxM8N {
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
      */
     function enableUbxMsg(classId, rate, onMessage = null) {
-        // Store handler
-        if (onMessage != null) _msgHandlers[classId] <- onMessage;
+        if (rate == 0 || onMessage == null) {
+            // Delete callback
+            if (type in _msgHandlers) _msgHandlers.rawdelete(type);
+        } else if (onMessage != null) {
+            // Store callback
+            _msgHandlers[classId] <- onMessage
+        }
+
         // Send command to enable message
         writeUBX(UBLOX_M8N_CONST.UBX_CFG_MSG_CLASS_MSG_ID, format("%c%c%c", classId >> 8, classId, rate));
     }

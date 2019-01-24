@@ -103,7 +103,6 @@ function nmeaMsgHandler(sentence) {
             server.log("--------------------------------------------");
         }
     }
-
 }
 
 function onMessage(msg, classId = null) {

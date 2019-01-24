@@ -68,7 +68,7 @@ None.
 
 ### enableUbxMsg(*classId, rate[, onMessage]*) ###
 
-Enable UBX messages at the specified rate. When messages are received they will be passed to the onMessage callback. If no onMessage callback is specified messages will be passed to either onUbxMsg or defaultOnMsg callback instead. To disable messages pass a rate of 0 to this method.
+Enable UBX messages at the specified rate. When messages are received they will be passed to the onMessage callback. If no onMessage callback is specified messages will be passed to either onUbxMsg or defaultOnMsg callback instead. To disable messages pass a rate of 0 to this method. If message is disabled the callback will also be unregistered.
 
 #### Parameters ####
 
@@ -84,7 +84,7 @@ None.
 
 ### registerOnMessageCallback(*type, onMessage*) ###
 
-Registers a message onMessage callback for incoming messages from the M8N.
+Registers a message onMessage callback for incoming messages from the M8N. To unregister a callback pass `null` to *onMessage*.
 
 #### Parameters ####
 
