@@ -22,30 +22,6 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-// Sample payloads from M8N
-// Msg Class ID: 0x0A09
-// Msg len: 60
-// binary: 00 f4 01 00 00 00 00 00 00 00 01 00 ef f7 00 00 6c 00 00 00 00 01 00 84 ff eb 01 00 0a 0b 0c 0d 0e 0f 01 00 02 03 ff 10 ff 12 13 36 35 00 0f 5e 00 00 00 00 80 f7 00 00 00 00 00 00
-
-// Msg Class ID: 0x0107
-// Msg len: 92
-// binary: e8 03 00 00 dd 07 09 01 00 00 01 f0 ff ff ff ff 00 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 00 00 00 00 98 bd ff ff ff ff ff ff 00 76 84 df 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 4e 00 00 80 a8 12 01 0f 27 00 00 86 4c 22 00 00 00 00 00 ff 00 00 00
-// Msg Class ID: 0x0107
-// Msg len: 92
-// binary: d0 09 b7 19 e3 07 01 18 17 32 08 f7 f7 03 00 00 a6 6c 02 00 03 01 0a 0b 44 aa 38 b7 fb 1a 4a 16 4b 5a 00 00 8a cf 00 00 2a 18 00 00 d7 10 00 00 f9 ff ff ff f9 ff ff ff fd ff ff ff 0a 00 00 00 00 00 00 00 61 01 00 00 14 6e 01 01 9a 00 00 e0 86 4c 22 00 00 00 02 00 00 00 00 80
-
-// Msg Class ID: 0x0135
-// Msg len: 8
-// binary: e8 03 00 00 01 00 00 00
-// Msg Class ID: 0x0135
-// Msg len: 284
-// binary: 30 f4 b7 19 01 17 00 00 00 05 0c 15 1c 01 63 00 1c 19 00 00 00 07 30 3e 32 00 ef ff 1f 19 00 00 00 08 25 23 3f 00 fd ff 1f 09 00 00 00 0b 00 10 75 00 00 00 11 09 00 00 00 0d 1f 0c 3d 01 6a ff 1e 09 00 00 00 17 19 0d 93 00 75 00 1c 19 00 00 00 1b 22 0e 28 00 fa ff 1f 19 00 00 00 1c 00 36 ec 00 00 00 11 12 00 00 00 1e 2c 3e 46 01 0a 00 1f 19 00 00 01 85 00 28 90 00 00 00 01 07 00 00 01 87 00 2d c6 00 00 00 01 07 00 00 01 8a 00 2c 9c 00 00 00 01 07 00 00 05 01 00 a5 00 00 00 00 01 00 00 00 05 04 00 a5 00 00 00 00 01 00 00 00 05 05 00 a5 00 00 00 00 01 00 00 00 06 01 00 0e b8 00 00 00 11 12 00 00 06 02 15 37 f4 00 00 00 14 12 00 00 06 03 21 20 3e 01 c1 ff 1f 19 00 00 06 0b 27 19 35 00 21 00 1f 19 00 00 06 0c 21 36 05 00 55 00 1f 19 00 00 06 0d 0b 1c 19 01 00 00 14 12 00 00 06 15 1d 17 38 00 1b 00 1e 19 00 00 06 16 1a 16 75 00 00 00 16 12 00 00
-
-
-// Msg Class ID: 0x0A04
-// Msg len: 100
-// binary: 32 2e 30 31 20 28 37 35 33 33 31 29 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 30 30 30 38 30 30 30 30 00 00 50 52 4f 54 56 45 52 20 31 35 2e 30 30 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 47 50 53 3b 53 42 41 53 3b 47 4c 4f 3b 42 44 53 3b 51 5a 53 53 00 00 00 00 00 00 00 00 00
-
 @include __PATH__+"/../Parser/UbxMsgParser.lib.nut"
 
 enum UBX_VALID_MSG {
@@ -56,7 +32,8 @@ enum UBX_VALID_MSG {
     ACK_NAK = "\x06\x01",
     MON_HW  = "\x00\xf4\x01\x00\x00\x00\x00\x00\x00\x00\x01\x00\xef\xf7\x00\x00\x6c\x00\x00\x00\x00\x01\x00\x84\xff\xeb\x01\x00\x0a\x0b\x0c\x0d\x0e\x0f\x01\x00\x02\x03\xff\x10\xff\x12\x13\x36\x35\x00\x0f\x5e\x00\x00\x00\x00\x80\xf7\x00\x00\x00\x00\x00\x00",
     MON_VER = "\x32\x2e\x30\x31\x20\x28\x37\x35\x33\x33\x31\x29\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x30\x30\x30\x38\x30\x30\x30\x30\x00\x00\x50\x52\x4f\x54\x56\x45\x52\x20\x31\x35\x2e\x30\x30\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x47\x50\x53\x3b\x53\x42\x41\x53\x3b\x47\x4c\x4f\x3b\x42\x44\x53\x3b\x51\x5a\x53\x53\x00\x00\x00\x00\x00\x00\x00\x00\x00",
-    MGA_ACK = ""
+    MON_VER_NO_EX = "\x32\x2e\x30\x31\x20\x28\x37\x35\x33\x33\x31\x29\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x30\x30\x30\x38\x30\x30\x30\x30\x00\x00",
+    MGA_ACK = "\x01\x00\x00\x06\x02\x00\x18\x00"
 }
 
 enum UBX_INVALID_MSG {
@@ -65,7 +42,7 @@ enum UBX_INVALID_MSG {
     ACK_ACK = "a",
     ACK_NAK = "m",
     MON_HW  = "\x06\x01",
-    MON_VER = "\x06\x01",
+    MON_VER = "\x32\x2e\x30\x31\x20\x28\x37\x35\x33\x33\x31\x29\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x30\x30\x30\x38\x30\x30\x30\x30\x00\x00\x50",
     MGA_ACK = "z"
 }
 
@@ -85,12 +62,89 @@ class UbxParserTests extends ImpTestCase {
         return b;
     }
 
+    function _getExpectedSatFlags(b1, b2) {
+        local flags = {
+                "sbasCorrUsed"  : 0,
+                "rtcmCorrUsed"  : 0,
+                "slasCorrUsed"  : 0,
+                "prCorrUsed"    : 0,
+                "crCorrUsed"    : 0,
+                "doCorrUsed"    : 0,
+                "diffCorr"      : 0,
+                "smoothed"      : 0,
+                "anoAvail"      : 0,
+                "aopAvail"      : 0
+        }
+        switch (b1 & 0x0F) {
+            case 0x01:
+                flags.qualityInd <- 1;
+                flags.svUsed <- 0;
+                break;
+            case 0x04:
+                flags.qualityInd <- 4;
+                flags.svUsed <- 0;
+                break;
+            case 0x06:
+                flags.qualityInd <- 6;
+                flags.svUsed <- 0;
+                break;
+            case 0x0c:
+                flags.qualityInd <- 4;
+                flags.svUsed <- 1;
+                break;
+            case 0x0e:
+                flags.qualityInd <- 6;
+                flags.svUsed <- 1;
+                break;
+            case 0x0f:
+                flags.qualityInd <- 7;
+                flags.svUsed <- 1;
+                break;
+        }
+        switch (b1 & 0xF0) {
+            case 0x00:
+                flags.health <- 0;
+                break;
+            case 0x10:
+                flags.health <- 1;
+                break;
+        }
+        switch (b2 & 0x0F) {
+            case 0x00:
+                flags.orbitSource <- 0;
+                flags.ephAvail <- 0;
+                break;
+            case 0x02:
+                flags.orbitSource <- 2;
+                flags.ephAvail <- 0;
+                break;
+            case 0x07:
+                flags.orbitSource <- 7;
+                flags.ephAvail <- 0;
+                break;
+            case 0x09:
+                flags.orbitSource <- 1;
+                flags.ephAvail <- 1;
+                break;
+        }
+        switch (b2 & 0xF0) {
+            case 0x00:
+                flags.almAvail <- 0;
+                break;
+            case 0x10:
+                flags.almAvail <- 1;
+                break;
+        }
+        return flags;
+    }
+
     function setUp() {
         return "No setUp needed for this test";
     }
 
     function testNavPvtValid() {
-        // Tests all fields are present and are expected type
+        // binary: d0 09 b7 19 e3 07 01 18 17 32 08 f7 f7 03 00 00 a6 6c 02 00 03 01 0a 0b 44 aa 38 b7 fb 1a 4a 16 4b 5a 00 00 8a cf 00 00 2a 18 00 00 d7 10 00 00 f9 ff ff ff f9 ff ff ff fd ff ff ff 0a 00 00 00 00 00 00 00 61 01 00 00 14 6e 01 01 9a 00 00 e0 86 4c 22 00 00 00 02 00 00 00 00 80
+        // Tests all fields are present and are expected type & value
         local payload = _createPayload(UBX_VALID_MSG.NAV_PVT);
         local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT](payload);
 
@@ -209,60 +263,582 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
     }
 
-    // function testNavSatShortValid() {
+    function testNavSatShortValid() {
+        // binary: e8 03 00 00 01 00 00 00
+        // Tests all fields are present and are expected type & value
+        local payload = _createPayload(UBX_VALID_MSG.NAV_SAT_SHORT);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT](payload);
 
-    // }
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
 
-    // function testNavSatLongValid() {
+        assertTrue("iTOW" in parsed && (typeof parsed.iTOW == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "iTOW"));
+        assertTrue(crypto.equals("\xe8\x03\x00\x00", parsed.iTOW), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "iTOW"));
 
-    // }
+        assertTrue("version" in parsed && typeof parsed.version == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "version"));
+        assertTrue(0x01 == parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
 
-    // function testNavSatInvalid() {
+        assertTrue("numSvs" in parsed && typeof parsed.numSvs == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "numSvs"));
+        assertTrue(0 == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "numSvs"));
 
-    // }
+        assertTrue("satInfo" in parsed && typeof parsed.satInfo == "array", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "satInfo"));
+        assertTrue(parsed.satInfo.len() == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo"));
+    }
 
-    // function testAckAckValid() {
+    function testNavSatLongValid() {
+        // binary: 30 f4 b7 19 01 17 00 00 + flags
+        // Tests all fields are present and are expected type & value
+        local payload = _createPayload(UBX_VALID_MSG.NAV_SAT_LONG);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT](payload);
 
-    // }
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
 
-    // function testAckAckInvalid() {
+        assertTrue("iTOW" in parsed && (typeof parsed.iTOW == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "iTOW"));
+        assertTrue(crypto.equals("\x30\xf4\xb7\x19", parsed.iTOW), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "iTOW"));
 
-    // }
+        assertTrue("version" in parsed && typeof parsed.version == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "version"));
+        assertTrue(0x01 == parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
 
-    // function testAckNakValid() {
+        assertTrue("numSvs" in parsed && typeof parsed.numSvs == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "numSvs"));
+        assertTrue(0x17 == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "numSvs"));
 
-    // }
+        assertTrue("satInfo" in parsed && typeof parsed.satInfo == "array", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "satInfo"));
+        assertTrue(parsed.satInfo.len() == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo"));
 
-    // function testAckNakInvalid() {
+        local expected = [
+            {   // idx = 0
+                // 00 05 0c 15 1c 01 63 00 1c 19 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x05,
+                "cno"    : 0x0c,
+                "elev"   : 0x15,    // signed int 8
+                "azim"   : 0x011c,  // signed int 16
+                "prRes"  : 0x0063,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1c, 0x19)
+            },
+            {   // idx = 1
+                // 00 07 30 3e 32 00 ef ff 1f 19 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x07,
+                "cno"    : 0x30,
+                "elev"   : 0x3e,                 // signed int 8
+                "azim"   : 0x0032,               // signed int 16
+                "prRes"  : (0xffef << 16) >> 16, // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1f, 0x19)
+            },
+            {   // idx = 2
+                // 00 08 25 23 3f 00 fd ff 1f 09 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x08,
+                "cno"    : 0x25,
+                "elev"   : 0x23,                 // signed int 8
+                "azim"   : 0x003f,               // signed int 16
+                "prRes"  : (0xfffd << 16) >> 16, // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1f, 0x09)
+            },
+            {   // idx = 3
+                // 00 0b 00 10 75 00 00 00 11 09 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x0b,
+                "cno"    : 0x00,
+                "elev"   : 0x10,    // signed int 8
+                "azim"   : 0x0075,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x11, 0x09)
+            },
+            {   // idx = 4
+                // 00 0d 1f 0c 3d 01 6a ff 1e 09 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x0d,
+                "cno"    : 0x1f,
+                "elev"   : 0x0c,                 // signed int 8
+                "azim"   : 0x013d,               // signed int 16
+                "prRes"  : (0xff6a << 16) >> 16, // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1e, 0x09)
+            },
+            {   // idx = 5
+                // 00 17 19 0d 93 00 75 00 1c 19 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x17,
+                "cno"    : 0x19,
+                "elev"   : 0x0d,    // signed int 8
+                "azim"   : 0x0093,  // signed int 16
+                "prRes"  : 0x0075,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1c, 0x19)
+            },
+            {   // idx = 6
+                // 00 1b 22 0e 28 00 fa ff 1f 19 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x1b,
+                "cno"    : 0x22,
+                "elev"   : 0x0e,                 // signed int 8
+                "azim"   : 0x0028,               // signed int 16
+                "prRes"  : (0xfffa << 16) >> 16, // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1f, 0x19)
+            },
+            {   // idx = 7
+                // 00 1c 00 36 ec 00 00 00 11 12 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x1c,
+                "cno"    : 0x00,
+                "elev"   : 0x36,    // signed int 8
+                "azim"   : 0x00ec,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x11, 0x12)
+            },
+            {   // idx = 8
+                // 00 1e 2c 3e 46 01 0a 00 1f 19 00 00
+                "gnssId" : 0x00,
+                "svId"   : 0x1e,
+                "cno"    : 0x2c,
+                "elev"   : 0x3e,    // signed int 8
+                "azim"   : 0x0146,  // signed int 16
+                "prRes"  : 0x000a,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1f, 0x19)
+            },
+            {   // idx = 9
+                // 01 85 00 28 90 00 00 00 01 07 00 00
+                "gnssId" : 0x01,
+                "svId"   : 0x85,
+                "cno"    : 0x00,
+                "elev"   : 0x28,    // signed int 8
+                "azim"   : 0x0090,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x01, 0x07)
+            },
+            {   // idx = 10
+                // 01 87 00 2d c6 00 00 00 01 07 00 00
+                "gnssId" : 0x01,
+                "svId"   : 0x87,
+                "cno"    : 0x00,
+                "elev"   : 0x2d,    // signed int 8
+                "azim"   : 0x00c6,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x01, 0x07)
+            },
+            {   // idx = 11
+                // 01 8a 00 2c 9c 00 00 00 01 07 00 00
+                "gnssId" : 0x01,
+                "svId"   : 0x8a,
+                "cno"    : 0x00,
+                "elev"   : 0x2c,    // signed int 8
+                "azim"   : 0x009c,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x01, 0x07)
+            },
+            {   // idx = 12
+                // 05 01 00 a5 00 00 00 00 01 00 00 00
+                "gnssId" : 0x05,
+                "svId"   : 0x01,
+                "cno"    : 0x00,
+                "elev"   : (0xa5 << 24) >> 24,  // signed int 8
+                "azim"   : 0x0000,              // signed int 16
+                "prRes"  : 0x0000,              // signed int 16
+                "flags"  : _getExpectedSatFlags(0x01, 0x00)
+            },
+            {   // idx = 13
+                // 05 04 00 a5 00 00 00 00 01 00 00 00
+                "gnssId" : 0x05,
+                "svId"   : 0x04,
+                "cno"    : 0x00,
+                "elev"   : (0xa5 << 24) >> 24,  // signed int 8
+                "azim"   : 0x0000,              // signed int 16
+                "prRes"  : 0x0000,              // signed int 16
+                "flags"  : _getExpectedSatFlags(0x01, 0x00)
+            },
+            {   // idx = 14
+                // 05 05 00 a5 00 00 00 00 01 00 00 00
+                "gnssId" : 0x05,
+                "svId"   : 0x05,
+                "cno"    : 0x00,
+                "elev"   : (0xa5 << 24) >> 24,  // signed int 8
+                "azim"   : 0x0000,              // signed int 16
+                "prRes"  : 0x0000,              // signed int 16
+                "flags"  : _getExpectedSatFlags(0x01, 0x00)
+            },
+            {   // idx = 15
+                // 06 01 00 0e b8 00 00 00 11 12 00 00
+                "gnssId" : 0x06,
+                "svId"   : 0x01,
+                "cno"    : 0x00,
+                "elev"   : 0x0e,    // signed int 8
+                "azim"   : 0x00b8,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x11, 0x012)
+            },
+            {   // idx = 16
+                // 06 02 15 37 f4 00 00 00 14 12 00 00
+                "gnssId" : 0x06,
+                "svId"   : 0x02,
+                "cno"    : 0x15,
+                "elev"   : 0x37,    // signed int 8
+                "azim"   : 0x00f4,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x14, 0x012)
+            },
+            {   // idx = 17
+                // 06 03 21 20 3e 01 c1 ff 1f 19 00 00
+                "gnssId" : 0x06,
+                "svId"   : 0x03,
+                "cno"    : 0x21,
+                "elev"   : 0x20,                 // signed int 8
+                "azim"   : 0x013e,               // signed int 16
+                "prRes"  : (0xffc1 << 16) >> 16, // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1f, 0x019)
+            },
+            {   // idx = 18
+                // 06 0b 27 19 35 00 21 00 1f 19 00 00
+                "gnssId" : 0x06,
+                "svId"   : 0x0b,
+                "cno"    : 0x27,
+                "elev"   : 0x19,    // signed int 8
+                "azim"   : 0x0035,  // signed int 16
+                "prRes"  : 0x0021,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1f, 0x019)
+            },
+            {   // idx = 19
+                // 06 0c 21 36 05 00 55 00 1f 19 00 00
+                "gnssId" : 0x06,
+                "svId"   : 0x0c,
+                "cno"    : 0x21,
+                "elev"   : 0x36,    // signed int 8
+                "azim"   : 0x0005,  // signed int 16
+                "prRes"  : 0x0055,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1f, 0x019)
+            },
+            {   // idx = 20
+                // 06 0d 0b 1c 19 01 00 00 14 12 00 00
+                "gnssId" : 0x06,
+                "svId"   : 0x0d,
+                "cno"    : 0x0b,
+                "elev"   : 0x1c,    // signed int 8
+                "azim"   : 0x0119,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x14, 0x012)
+            },
+            {   // idx = 21
+                // 06 15 1d 17 38 00 1b 00 1e 19 00 00
+                "gnssId" : 0x06,
+                "svId"   : 0x15,
+                "cno"    : 0x1d,
+                "elev"   : 0x17,    // signed int 8
+                "azim"   : 0x0038,  // signed int 16
+                "prRes"  : 0x001b,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x1e, 0x019)
+            },
+            {   // idx = 22
+                // 06 16 1a 16 75 00 00 00 16 12 00 00
+                "gnssId" : 0x06,
+                "svId"   : 0x16,
+                "cno"    : 0x1a,
+                "elev"   : 0x16,    // signed int 8
+                "azim"   : 0x0075,  // signed int 16
+                "prRes"  : 0x0000,  // signed int 16
+                "flags"  : _getExpectedSatFlags(0x16, 0x012)
+            }
+        ]
 
-    // }
+        foreach (idx, sat in parsed.satInfo) {
+            local ex = expected[idx];
+            assertTrue("gnssId" in sat && typeof sat.gnssId == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "gnssId"));
+            assertTrue(ex.gnssId == sat.gnssId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " gnssId"));
 
-    // function testMonVerValid() {
+            assertTrue("svId" in sat && typeof sat.svId == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "svId"));
+            assertTrue(ex.svId == sat.svId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " svId"));
 
-    // }
+            assertTrue("cno" in sat && typeof sat.cno == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "cno"));
+            assertTrue(ex.cno == sat.cno, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " cno"));
 
-    // function testMonVerInvalid() {
+            assertTrue("elev" in sat && typeof sat.elev == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "elev"));
+            assertTrue(ex.elev == sat.elev, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " elev"));
 
-    // }
+            assertTrue("azim" in sat && typeof sat.azim == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "azim"));
+            assertTrue(ex.azim == sat.azim, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " azim"));
 
-    // function testMonHwValid() {
+            assertTrue("prRes" in sat && typeof sat.prRes == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "prRes"));
+            assertTrue(ex.prRes == sat.prRes, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " prRes"));
 
-    // }
+            assertTrue("flags" in sat && typeof sat.flags == "table", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "satInfo " + idx + " flags"));
 
-    // function testMonHwInvalid() {
+            local flags = sat.flags;
+            local exFlags = ex.flags;
+            assertTrue(flags.qualityInd == exFlags.qualityInd, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags qualityInd"));
+            assertTrue(flags.svUsed == exFlags.svUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags svUsed"));
+            assertTrue(flags.health == exFlags.health, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags health"));
+            assertTrue(flags.diffCorr == exFlags.diffCorr, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags diffCorr"));
+            assertTrue(flags.smoothed == exFlags.smoothed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags smoothed"));
+            assertTrue(flags.orbitSource == exFlags.orbitSource, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags orbitSource"));
+            assertTrue(flags.ephAvail == exFlags.ephAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags ephAvail"));
+            assertTrue(flags.almAvail == exFlags.almAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags almAvail"));
+            assertTrue(flags.anoAvail == exFlags.anoAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags anoAvail"));
+            assertTrue(flags.aopAvail == exFlags.aopAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags aopAvail"));
+            assertTrue(flags.sbasCorrUsed == exFlags.sbasCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags sbasCorrUsed"));
+            assertTrue(flags.rtcmCorrUsed == exFlags.rtcmCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags rtcmCorrUsed"));
+            assertTrue(flags.slasCorrUsed == exFlags.slasCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags slasCorrUsed"));
+            assertTrue(flags.prCorrUsed == exFlags.prCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags prCorrUsed"));
+            assertTrue(flags.crCorrUsed == exFlags.crCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags crCorrUsed"));
+            assertTrue(flags.doCorrUsed == exFlags.doCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags doCorrUsed"));
+        }
+    }
 
-    // }
+    function testNavSatInvalid() {
+        local payload = _createPayload(UBX_INVALID_MSG.NAV_SAT);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT](payload);
+        local error = format(UbxMsgParser.ERROR_PARSING, "");
 
-    // function testMgaAckValid() {
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+    }
 
-    // }
+    function testAckAckValid() {
+        // binary: 06 01
+        // Tests all fields are present and are expected type & value
+        local payload = _createPayload(UBX_VALID_MSG.ACK_ACK);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_ACK](payload);
 
-    // function testMgaAckInvalid() {
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
 
-    // }
+        assertTrue("ackMsgClassId" in parsed && (typeof parsed.ackMsgClassId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "ackMsgClassId"));
+        assertTrue(0x0601 == parsed.ackMsgClassId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "ackMsgClassId"));
+    }
+
+    function testAckAckInvalid() {
+        local payload = _createPayload(UBX_INVALID_MSG.ACK_ACK);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_ACK](payload);
+        local error = format(UbxMsgParser.ERROR_PARSING, "");
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+    }
+
+    function testAckNakValid() {
+        // binary: 06 01
+        // Tests all fields are present and are expected type & value
+        local payload = _createPayload(UBX_VALID_MSG.ACK_NAK);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_NAK](payload);
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
+
+        assertTrue("nakMsgClassId" in parsed && (typeof parsed.nakMsgClassId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "nakMsgClassId"));
+        assertTrue(0x0601 == parsed.nakMsgClassId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "nakMsgClassId"));
+    }
+
+    function testAckNakInvalid() {
+        local payload = _createPayload(UBX_INVALID_MSG.ACK_NAK);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_NAK](payload);
+        local error = format(UbxMsgParser.ERROR_PARSING, "");
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+    }
+
+    function testMonVerValidWithExSw() {
+        // binary: 32 2e 30 31 20 28 37 35 33 33 31 29 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 30 30 30 38 30 30 30 30 00 00 50 52 4f 54 56 45 52 20 31 35 2e 30 30 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 47 50 53 3b 53 42 41 53 3b 47 4c 4f 3b 42 44 53 3b 51 5a 53 53 00 00 00 00 00 00 00 00 00
+        // Tests all fields are present and are expected type & value
+        local payload = _createPayload(UBX_VALID_MSG.MON_VER);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER](payload);
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
+
+        assertTrue("swVersion" in parsed && (typeof parsed.swVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "swVersion"));
+        assertTrue("2.01 (75331)" == parsed.swVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "swVersion"));
+        assertTrue("hwVersion" in parsed && (typeof parsed.hwVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "hwVersion"));
+        assertTrue("00080000" == parsed.hwVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hwVersion"));
+
+        local expectedExSwInfo = [
+            "PROTVER 15.00",
+            "GPS;SBAS;GLO;BDS;QZSS"
+        ];
+        local swInfo = parsed.exSwInfo;
+
+        assertTrue("exSwInfo" in parsed && (typeof swInfo == "array"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "exSwInfo"));
+        foreach(idx, infoStr in swInfo) {
+            assertTrue(expectedExSwInfo[idx] == infoStr, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "exSwInfo at index " + idx));
+        }
+    }
+
+    function testMonVerValidWithOutExSw() {
+        // binary: 32 2e 30 31 20 28 37 35 33 33 31 29 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 30 30 30 38 30 30 30 30 00 00
+        // Tests all fields are present and are expected type & value
+        local payload = _createPayload(UBX_VALID_MSG.MON_VER_NO_EX);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER](payload);
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
+
+        assertTrue("swVersion" in parsed && (typeof parsed.swVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "swVersion"));
+        assertTrue("2.01 (75331)" == parsed.swVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "swVersion"));
+        assertTrue("hwVersion" in parsed && (typeof parsed.hwVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "hwVersion"));
+        assertTrue("00080000" == parsed.hwVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hwVersion"));
+        assertTrue(!("exSwInfo" in parsed), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "exSwInfo"));
+    }
+
+    function testMonVerInvalid() {
+        local payload = _createPayload(UBX_INVALID_MSG.MON_VER);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_VER](payload);
+        local error = format(UbxMsgParser.ERROR_PARSING, "");
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+    }
+
+    function testMonHwValid() {
+        // binary: 00 f4 01 00 00 00 00 00 00 00 01 00 ef f7 00 00 6c 00 00 00 00 01 00 84 ff eb 01 00 0a 0b 0c 0d 0e 0f 01 00 02 03 ff 10 ff 12 13 36 35 00 0f 5e
+        // 00 00 00 00 80 f7 00 00 00 00 00 00
+        // Tests all fields are present and are expected type & value
+        local payload = _createPayload(UBX_VALID_MSG.MON_HW);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW](payload);
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
+
+        assertTrue("pinSel" in parsed && (typeof parsed.pinSel == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pinSel"));
+        assertTrue(crypto.equals("\x00\xf4\x01\x00", parsed.pinSel), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pinSel"));
+
+        assertTrue("pinBank" in parsed && (typeof parsed.pinBank == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pinBank"));
+        assertTrue(crypto.equals("\x00\x00\x00\x00", parsed.pinBank), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pinBank"));
+
+        assertTrue("pinDir" in parsed && (typeof parsed.pinDir == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pinDir"));
+        assertTrue(crypto.equals("\x00\x00\x01\x00", parsed.pinDir), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pinDir"));
+
+        assertTrue("pinVal" in parsed && (typeof parsed.pinVal == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pinVal"));
+        assertTrue(crypto.equals("\xef\xf7\x00\x00", parsed.pinVal), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pinVal"));
+
+        assertTrue("noisePerMS" in parsed && (typeof parsed.noisePerMS == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "noisePerMS"));
+        assertTrue(0x006c == parsed.noisePerMS, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "noisePerMS"));
+
+        assertTrue("agcCnt" in parsed && (typeof parsed.agcCnt == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "agcCnt"));
+        assertTrue(0x0000 == parsed.agcCnt, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "agcCnt"));
+
+        assertTrue("aStatus" in parsed && (typeof parsed.aStatus == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "aStatus"));
+        assertTrue(0x00 == parsed.aStatus, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "aStatus"));
+
+        assertTrue("aPower" in parsed && (typeof parsed.aPower == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "aPower"));
+        assertTrue(0x01 == parsed.aPower, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "aPower"));
+
+        assertTrue("flags" in parsed && (typeof parsed.flags == "table"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "flags"));
+
+        local expectedFlags = {
+            "rtcCalib"      : 0,
+            "safeBoot"      : 0,
+            "jammingState"  : 0,
+            "xtalAbsent"    : 0
+        }
+        local flags = parsed.flags;
+
+        assertTrue("rtcCalib" in flags && (typeof flags.rtcCalib == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "rtcCalib"));
+        assertTrue(0 == flags.rtcCalib, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "rtcCalib flag"));
+
+        assertTrue("safeBoot" in flags && (typeof flags.safeBoot == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "safeBoot"));
+        assertTrue(0 == flags.safeBoot, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "safeBoot flag"));
+
+        assertTrue("jammingState" in flags && (typeof flags.jammingState == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "jammingState"));
+        assertTrue(0 == flags.jammingState, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "jammingState flag"));
+
+        assertTrue("xtalAbsent" in flags && (typeof flags.safeBoot == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "xtalAbsent"));
+        assertTrue(0 == flags.safeBoot, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "xtalAbsent flag"));
+
+        assertTrue("usedMask" in parsed && (typeof parsed.usedMask == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "usedMask"));
+        assertTrue(crypto.equals("\xff\xeb\x01\x00", parsed.usedMask), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "usedMask"));
+
+        assertTrue("vp" in parsed && (typeof parsed.vp == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "vp"));
+        assertTrue(crypto.equals("\x0a\x0b\x0c\x0d\x0e\x0f\x01\x00\x02\x03\xff\x10\xff\x12\x13\x36\x35", parsed.vp), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "vp"));
+
+        assertTrue("jamInd" in parsed && (typeof parsed.jamInd == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "jamInd"));
+        assertTrue(0x00 == parsed.jamInd, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "jamInd"));
+
+        assertTrue("pinIrq" in parsed && (typeof parsed.pinIrq == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pinIrq"));
+        assertTrue(crypto.equals("\x00\x00\x00\x00", parsed.pinIrq), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pinIrq"));
+
+        assertTrue("pullH" in parsed && (typeof parsed.pullH == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pullH"));
+        assertTrue(crypto.equals("\x80\xf7\x00\x00", parsed.pullH), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pullH"));
+
+        assertTrue("pullL" in parsed && (typeof parsed.pullL == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pullL"));
+        assertTrue(crypto.equals("\x00\x00\x00\x00", parsed.pullL), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pullL"));
+
+    }
+
+    function testMonHwInvalid() {
+        local payload = _createPayload(UBX_INVALID_MSG.MON_HW);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW](payload);
+        local error = format(UbxMsgParser.ERROR_PARSING, "");
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+    }
+
+    function testMgaAckValid() {
+        // binary: 01 00 00 06 02 00 18 00
+        // Tests all fields are present and are expected type & value
+        local payload = _createPayload(UBX_VALID_MSG.MGA_ACK);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK](payload);
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
+
+        assertTrue("type" in parsed && (typeof parsed.type == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "type"));
+        assertTrue(0x01 == parsed.type, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "type"));
+
+        assertTrue("version" in parsed && (typeof parsed.version == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "version"));
+        assertTrue(0x00 == parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
+
+        assertTrue("infoCode" in parsed && (typeof parsed.infoCode == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "infoCode"));
+        assertTrue(0x00 == parsed.infoCode, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "infoCode"));
+
+        assertTrue("msgId" in parsed && (typeof parsed.msgId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "msgId"));
+        assertTrue(0x06 == parsed.msgId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "msgId"));
+
+        assertTrue("msgPayloadStart" in parsed && (typeof parsed.msgPayloadStart == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "msgPayloadStart"));
+        assertTrue(crypto.equals("\x02\x00\x18\x00", parsed.msgPayloadStart), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "msgPayloadStart"));
+    }
+
+    function testMgaAckInvalid() {
+        local payload = _createPayload(UBX_INVALID_MSG.MGA_ACK);
+        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK](payload);
+        local error = format(UbxMsgParser.ERROR_PARSING, "");
+
+        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
+        assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+    }
 
     function tearDown() {
         return "Test finished";
     }
 
 }
+
+
+// Sample payloads from M8N
+// ----------------------------------------------------------------------
+// Msg Class ID: 0x0A09
+// Msg len: 60
+// binary: 00 f4 01 00 00 00 00 00 00 00 01 00 ef f7 00 00 6c 00 00 00 00 01 00 84 ff eb 01 00 0a 0b 0c 0d 0e 0f 01 00 02 03 ff 10 ff 12 13 36 35 00 0f 5e 00 00 00 00 80 f7 00 00 00 00 00 00
+
+// Msg Class ID: 0x0107
+// Msg len: 92
+// binary: e8 03 00 00 dd 07 09 01 00 00 01 f0 ff ff ff ff 00 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 00 00 00 00 98 bd ff ff ff ff ff ff 00 76 84 df 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 4e 00 00 80 a8 12 01 0f 27 00 00 86 4c 22 00 00 00 00 00 ff 00 00 00
+// binary: d0 09 b7 19 e3 07 01 18 17 32 08 f7 f7 03 00 00 a6 6c 02 00 03 01 0a 0b 44 aa 38 b7 fb 1a 4a 16 4b 5a 00 00 8a cf 00 00 2a 18 00 00 d7 10 00 00 f9 ff ff ff f9 ff ff ff fd ff ff ff 0a 00 00 00 00 00 00 00 61 01 00 00 14 6e 01 01 9a 00 00 e0 86 4c 22 00 00 00 02 00 00 00 00 80
+
+// Msg Class ID: 0x0135
+// Msg len: 8
+// binary: e8 03 00 00 01 00 00 00
+// Msg Class ID: 0x0135
+// Msg len: 284
+// binary: 30 f4 b7 19 01 17 00 00 00 05 0c 15 1c 01 63 00 1c 19 00 00 00 07 30 3e 32 00 ef ff 1f 19 00 00 00 08 25 23 3f 00 fd ff 1f 09 00 00 00 0b 00 10 75 00 00 00 11 09 00 00 00 0d 1f 0c 3d 01 6a ff 1e 09 00 00 00 17 19 0d 93 00 75 00 1c 19 00 00 00 1b 22 0e 28 00 fa ff 1f 19 00 00 00 1c 00 36 ec 00 00 00 11 12 00 00 00 1e 2c 3e 46 01 0a 00 1f 19 00 00 01 85 00 28 90 00 00 00 01 07 00 00 01 87 00 2d c6 00 00 00 01 07 00 00 01 8a 00 2c 9c 00 00 00 01 07 00 00 05 01 00 a5 00 00 00 00 01 00 00 00 05 04 00 a5 00 00 00 00 01 00 00 00 05 05 00 a5 00 00 00 00 01 00 00 00 06 01 00 0e b8 00 00 00 11 12 00 00 06 02 15 37 f4 00 00 00 14 12 00 00 06 03 21 20 3e 01 c1 ff 1f 19 00 00 06 0b 27 19 35 00 21 00 1f 19 00 00 06 0c 21 36 05 00 55 00 1f 19 00 00 06 0d 0b 1c 19 01 00 00 14 12 00 00 06 15 1d 17 38 00 1b 00 1e 19 00 00 06 16 1a 16 75 00 00 00 16 12 00 00
+
+// Msg Class ID: 0x0A04
+// Msg len: 100
+// binary: 32 2e 30 31 20 28 37 35 33 33 31 29 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 30 30 30 38 30 30 30 30 00 00 50 52 4f 54 56 45 52 20 31 35 2e 30 30 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 47 50 53 3b 53 42 41 53 3b 47 4c 4f 3b 42 44 53 3b 51 5a 53 53 00 00 00 00 00 00 00 00 00
+
+// Msg Class ID: 0x1360
+// Msg len: 8
+// binary: 01 00 00 06 02 00 18 00
+// binary: 01 00 00 00 04 00 00 00
+// binary: 01 00 00 00 06 00 00 00
+// binary: 01 00 00 00 05 00 00 00
+// binary: 01 00 00 06 03 00 62 04
+// binary: 01 00 00 40 30 00 00 00

@@ -295,21 +295,21 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_SAT] <- function(payload) {
             local flags = payload.readn('i'); // Read flag bits
             info.flags <- {
                 "qualityInd"    : flags & 0x00000007,
-                "svUsed"        : flags & 0x00000008 >> 3,
-                "health"        : flags & 0x00000030 >> 4,
-                "diffCorr"      : flags & 0x00000040 >> 6,
-                "smoothed"      : flags & 0x00000080 >> 7,
-                "orbitSource"   : flags & 0x00000700 >> 8,
-                "ephAvail"      : flags & 0x00000800 >> 11,
-                "almAvail"      : flags & 0x00001000 >> 12,
-                "anoAvail"      : flags & 0x00002000 >> 13,
-                "aopAvail"      : flags & 0x00004000 >> 14,
-                "sbasCorrUsed"  : flags & 0x00010000 >> 16,
-                "rtcmCorrUsed"  : flags & 0x00020000 >> 17,
-                "slasCorrUsed"  : flags & 0x00040000 >> 18,
-                "prCorrUsed"    : flags & 0x00100000 >> 20,
-                "crCorrUsed"    : flags & 0x00200000 >> 21,
-                "doCorrUsed"    : flags & 0x00400000 >> 22
+                "svUsed"        : (flags & 0x00000008) >> 3, // ??
+                "health"        : (flags & 0x00000030) >> 4, // ??
+                "diffCorr"      : (flags & 0x00000040) >> 6,
+                "smoothed"      : (flags & 0x00000080) >> 7,
+                "orbitSource"   : (flags & 0x00000700) >> 8,  // ??
+                "ephAvail"      : (flags & 0x00000800) >> 11, // ??
+                "almAvail"      : (flags & 0x00001000) >> 12, // ??
+                "anoAvail"      : (flags & 0x00002000) >> 13,
+                "aopAvail"      : (flags & 0x00004000) >> 14,
+                "sbasCorrUsed"  : (flags & 0x00010000) >> 16,
+                "rtcmCorrUsed"  : (flags & 0x00020000) >> 17,
+                "slasCorrUsed"  : (flags & 0x00040000) >> 18,
+                "prCorrUsed"    : (flags & 0x00100000) >> 20,
+                "crCorrUsed"    : (flags & 0x00200000) >> 21,
+                "doCorrUsed"    : (flags & 0x00400000) >> 22,
             }
 
             parsed.satInfo.push(info);
@@ -337,7 +337,7 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_ACK] <- function(payload) {
     try {
         // Returns classid of ACK-ed msg
         return {
-            "ackMsgClassId" : payload[0] << 4 | payload[1],
+            "ackMsgClassId" : payload[0] << 8 | payload[1],
             "error"         : null,
             "payload"       : payload
         };
@@ -361,7 +361,7 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.ACK_NAK] <- function(payload) {
     try {
         // Returns classid of NAK-ed msg
         return {
-            "nakMsgClassId" : payload[0] << 4 | payload[1],
+            "nakMsgClassId" : payload[0] << 8 | payload[1],
             "error"         : null,
             "payload"       : payload
         };
@@ -491,9 +491,9 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
         local flags = payload.readn('b');
         parsed.flags <- {
             "rtcCalib"     : flags & 0x01,
-            "safeBoot"     : flags & 0x02 >> 1,
-            "jammingState" : flags & 0x0C >> 2,
-            "xtalAbsent"   : flags & 0x10 >> 4
+            "safeBoot"     : (flags & 0x02) >> 1,
+            "jammingState" : (flags & 0x0C) >> 2,
+            "xtalAbsent"   : (flags & 0x10) >> 4
         }
         payload.seek(24, 'b');
         parsed.usedMask <- payload.readblob(4);
