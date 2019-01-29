@@ -62,7 +62,7 @@ imp.enableblinkup(true);
 server.log("Imp Software Version...");
 server.log(imp.getsoftwareversion());
 
-// Configure Hardware
+// Configure Hardware - impC001 Breakout Board
 powergate <- hardware.pinYG;
 powergate.configure(DIGITAL_OUT, 1);
 gpsUART <- hardware.uartNU;
