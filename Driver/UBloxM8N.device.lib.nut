@@ -237,10 +237,10 @@ class UBloxM8N {
     function enableUbxMsg(classId, rate, onMessage = null) {
         if (rate == 0 || onMessage == null) {
             // Delete callback
-            if (type in _msgHandlers) _msgHandlers.rawdelete(type);
+            if (classId in _msgHandlers) _msgHandlers.rawdelete(classId);
         } else if (onMessage != null) {
             // Store callback
-            _msgHandlers[classId] <- onMessage
+            _msgHandlers[classId] <- onMessage;
         }
 
         // Send command to enable message
