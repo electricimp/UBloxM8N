@@ -252,6 +252,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue("magAcc" in parsed && typeof parsed.magAcc == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "magAcc"));
         assertTrue(0x8000 == parsed.magAcc, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "magAcc"));
+
+        return "Valid NAV-PVT message parse test passed.";
     }
 
     function testNavPvtInvalid() {
@@ -261,6 +263,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
         assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+
+        return "Invalid NAV-PVT message returned expected error.";
     }
 
     function testNavSatShortValid() {
@@ -283,6 +287,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue("satInfo" in parsed && typeof parsed.satInfo == "array", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "satInfo"));
         assertTrue(parsed.satInfo.len() == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo"));
+
+        return "Valid NAV-SAT message with no satInfo parse test passed.";
     }
 
     function testNavSatLongValid() {
@@ -580,6 +586,8 @@ class UbxParserTests extends ImpTestCase {
             assertTrue(flags.crCorrUsed == exFlags.crCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags crCorrUsed"));
             assertTrue(flags.doCorrUsed == exFlags.doCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags doCorrUsed"));
         }
+
+        return "Valid NAV-SAT message with satInfo parse test passed.";
     }
 
     function testNavSatInvalid() {
@@ -589,6 +597,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
         assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+
+        return "Invalid NAV-SAT message returned expected error.";
     }
 
     function testAckAckValid() {
@@ -602,6 +612,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue("ackMsgClassId" in parsed && (typeof parsed.ackMsgClassId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "ackMsgClassId"));
         assertTrue(0x0601 == parsed.ackMsgClassId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "ackMsgClassId"));
+
+        return "Valid ACK-ACK message parse test passed.";
     }
 
     function testAckAckInvalid() {
@@ -611,6 +623,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
         assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+
+        return "Invalid ACK-ACK message returned expected error.";
     }
 
     function testAckNakValid() {
@@ -624,6 +638,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue("nakMsgClassId" in parsed && (typeof parsed.nakMsgClassId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "nakMsgClassId"));
         assertTrue(0x0601 == parsed.nakMsgClassId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "nakMsgClassId"));
+
+        return "Valid ACK-NAK message parse test passed.";
     }
 
     function testAckNakInvalid() {
@@ -633,6 +649,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
         assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+
+        return "Invalid ACK-NAK message returned expected error.";
     }
 
     function testMonVerValidWithExSw() {
@@ -659,6 +677,8 @@ class UbxParserTests extends ImpTestCase {
         foreach(idx, infoStr in swInfo) {
             assertTrue(expectedExSwInfo[idx] == infoStr, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "exSwInfo at index " + idx));
         }
+
+        return "Valid MON-VER message with extended info parse test passed.";
     }
 
     function testMonVerValidWithOutExSw() {
@@ -675,6 +695,8 @@ class UbxParserTests extends ImpTestCase {
         assertTrue("hwVersion" in parsed && (typeof parsed.hwVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "hwVersion"));
         assertTrue("00080000" == parsed.hwVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hwVersion"));
         assertTrue(!("exSwInfo" in parsed), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "exSwInfo"));
+
+        return "Valid MON-VER message without extended info parse test passed.";
     }
 
     function testMonVerInvalid() {
@@ -684,6 +706,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
         assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+
+        return "Invalid MON-VER message returned expected error.";
     }
 
     function testMonHwValid() {
@@ -760,6 +784,7 @@ class UbxParserTests extends ImpTestCase {
         assertTrue("pullL" in parsed && (typeof parsed.pullL == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pullL"));
         assertTrue(crypto.equals("\x00\x00\x00\x00", parsed.pullL), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pullL"));
 
+        return "Valid MON-HW message parse test passed.";
     }
 
     function testMonHwInvalid() {
@@ -769,6 +794,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
         assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+
+        return "Invalid MON-HW message returned expected error.";
     }
 
     function testMgaAckValid() {
@@ -794,6 +821,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue("msgPayloadStart" in parsed && (typeof parsed.msgPayloadStart == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "msgPayloadStart"));
         assertTrue(crypto.equals("\x02\x00\x18\x00", parsed.msgPayloadStart), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "msgPayloadStart"));
+
+        return "Valid MGA-ACK message parse test passed.";
     }
 
     function testMgaAckInvalid() {
@@ -803,6 +832,8 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
         assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
+
+        return "Invalid MGA-ACK message returned expected error.";
     }
 
     function tearDown() {

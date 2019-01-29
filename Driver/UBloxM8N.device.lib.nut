@@ -32,8 +32,8 @@ enum UBLOX_M8N_CONST {
     NMEA_CONFIG_MSG_HEADER   = "PUBX,41",
     NMEA_LINE_MAX            = 150,
     NMEA_START_CHAR          = '$',         // 0x24
-    NMEA_END_CHAR_1          = 0x0D,        // CARRIAGE_RETURN, 2nd to last end char
-    NMEA_END_CHAR_2          = 0x0A,        // LINE_FEED, last end char
+    NMEA_END_CHAR_1          = '\n',        // CARRIAGE_RETURN, 2nd to last end char
+    NMEA_END_CHAR_2          = '\r',        // LINE_FEED, last end char
 
     DEFUALT_BAUDRATE         = 9600,
     DEFUALT_UBX_BAUDRATE     = 115200,
@@ -142,7 +142,7 @@ class UBloxM8N {
             return;
         }
 
-        local baudrate = ("baudRate" in opts) ? opts.baudRate : UBLOX_M8N_CONST.DEFUALT_BAUDRATE;
+        local baudrate = ("baudRate" in opts) ? opts.baudRate : _currBaudRate;
         local output   = ("outputMode" in opts) ? opts.outputMode : UBLOX_M8N_MSG_MODE.BOTH;
         local input    = ("inputMode" in opts) ? opts.inputMode : UBLOX_M8N_MSG_MODE.BOTH;
         if ("defaultOnMsg" in opts)  _msgHandlers[UBLOX_M8N_CONST.DEFAULT_ON_MSG] <- opts.defaultOnMsg;
@@ -287,7 +287,10 @@ class UBloxM8N {
         }
 
         // Make sure sentence starts with the correct start character
-        if (sentence[0] != UBLOX_M8N_CONST.NMEA_START_CHAR) sentence = UBLOX_M8N_CONST.NMEA_START_CHAR + sentence;
+        if (sentence[0] != UBLOX_M8N_CONST.NMEA_START_CHAR) {
+            sentence = format("%c%s", UBLOX_M8N_CONST.NMEA_START_CHAR, sentence);
+            // sentence = UBLOX_M8N_CONST.NMEA_START_CHAR + sentence;
+        }
 
         // Add check sum and/or ending characters if needed
         local astIdx = sentence.find("*");
