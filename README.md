@@ -1,28 +1,28 @@
 # UBloxM8N #
 
-Electric Imp offers two libraries to support the UBLOX M8N GPS module: a device-side driver class, and a parser. The libraries are based on the commands as defined by [Reciever Description Including Protocol Specification document](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
+Electric Imp offers two libraries to support the [u-blox M8N GPS module](https://www.u-blox.com/en/product/neo-m8-series): a device-side driver class, and a message parser. The libraries are based on the commands defined in the [u-blox receiver protocol specification](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
 
 ## [UBloxM8N](./Driver) ##
 
-UART driver for u-blox M8N GPS module.
+This is a UART driver for u-blox M8N GPS module.
 
 [Documentation](./Driver/README.md)
 
-[Code](./Driver/UBloxM8N.device.lib.nut)
+[Library source code](./Driver/UBloxM8N.device.lib.nut)
 
-**To add this library to your project, add** `#require "UBloxM8N.device.lib.nut:1.0.0"` **to the top of your device code.**
+**To include this library in your project, add** `#require "UBloxM8N.device.lib.nut:1.0.0"` **at the top of your device code.**
 
 ## [UbxMsgParser](./Parser) ##
 
-Parser for UBX binary messages. For information about UBX message  see [Reciever Description Including Protocol Specification document](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
+This is a parser for UBX binary messages. For information about UBX message, please see the [u-blox receiver protocol specification](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
 
-This parser is a table, so command parsing functions can be added and customized. A small number of messages have been selected as a base. These commands are detailed in the documentation.
+The parser is implemented as a table, so parsing functions can be added and customized. A small number of messages have been selected as a base. These commands are detailed in the documentation.
 
 [Documentation](./Parser/README.md)
 
-[Code](./Parser/UbxMsgParser.lib.nut)
+[Library source code](./Parser/UbxMsgParser.lib.nut)
 
-**To add this library to your project, add** `#require "UbxMsgParser.lib.nut:1.0.0"` **to the top of your code.**
+**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:1.0.0"` **at the top of your code.**
 
 ## [Examples](./Examples) ##
 
