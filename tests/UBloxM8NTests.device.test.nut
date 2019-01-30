@@ -254,17 +254,17 @@ class UbxM8NTests extends ImpTestCase {
         return "Expected UBX check sum returned.";
     }
 
-    function testCalcNMEAChecksum() {
+    function testCalcNmeaChecksum() {
         // Test that expected check sum is returned
 
         local withAst = "$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*";
         local withOutAst = "$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K";
         local expectedCS = "48";
 
-        local actualWith = _ubx.calcNMEACheckSum(withAst);
+        local actualWith = _ubx.calcNmeaChecksum(withAst);
         assertTrue(crypto.equals(expectedCS, format("%02x" actualWith)), "NMEA check sum from sentence with * calculation error");
 
-        local actualWithout = _ubx.calcNMEACheckSum(withOutAst);
+        local actualWithout = _ubx.calcNmeaChecksum(withOutAst);
         assertTrue(crypto.equals(expectedCS, format("%02x" actualWithout)), "NMEA check sum from sentence without * calculation error");
 
         return "Expected NMEA check sum returned.";

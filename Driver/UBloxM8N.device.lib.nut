@@ -299,10 +299,10 @@ class UBloxM8N {
             // Delete ending characters if there were any
             sentence = strip(sentence);
             // Add check sum and ending characters
-            sentence = format("%s*%02x%c%c", sentence, calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
+            sentence = format("%s*%02x%c%c", sentence, calcNmeaChecksum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
         } else if (astIdx == sentence.len() - 1) /*Last char was *, need to add check sum*/ {
             // Add check sum and ending characters
-            sentence = format("%s%02x%c%c", sentence, calcNMEACheckSum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
+            sentence = format("%s%02x%c%c", sentence, calcNmeaChecksum(sentence), UBLOX_M8N_CONST.NMEA_END_CHAR_1, UBLOX_M8N_CONST.NMEA_END_CHAR_2);
         } else if (sentence.find(UBLOX_M8N_CONST.NMEA_END_CHAR_1.tochar()) == null || sentence.find(UBLOX_M8N_CONST.NMEA_END_CHAR_2.tochar()) == null) /*Sentence has check sum but is missing termination characters, add them*/ {
             // Delete ending characters if there were any
             sentence = strip(sentence);
@@ -359,7 +359,7 @@ class UBloxM8N {
      *
      * @returns {integer} 1 byte check sum
      */
-    function calcNMEACheckSum(sentence) {
+    function calcNmeaChecksum(sentence) {
         local check = 0;
         local index = (sentence[0] == UBLOX_M8N_CONST.NMEA_START_CHAR) ? 1 : 0;
         while(index < sentence.len() && sentence[index] != '*') {

@@ -8,7 +8,7 @@ This library provides a driver for a [u-blox M8N GPS module](https://www.u-blox.
 
 ### Received Message Callbacks ###
 
-When a valid message is received from the M8N, it will be passed to a message callback if one has been set. For any given message, only **one** callback will be triggered &mdash; the first available in the following order: 
+When a valid message is received from the M8N, it will be passed to a message callback if one has been set. For any given message, only **one** callback will be triggered &mdash; the first available in the following order:
 
 1. If a message-specific callback, ie. one targeting a specific two-byte message class ID, has been registered, it will be used.
 2. If no message-specific callback has been registered, the generic, type-specific callbacks, *onNmeaMsg* or *onUbxMsg*, will be used, depending of the type of message received.
@@ -77,7 +77,7 @@ Nothing.
 
 ### enableUbxMsg(*classID, rate[, callback]*) ###
 
-This method enables UBX messages of the specified ID to be received at the specified rate. When messages are received, they will be passed to the function passed into the *callback* parameter. If no such message-specific callback has been provided (it is optional), messages will instead be passed either to the type-specific [*onUbxMsg* callback](#received-message-callbacks) or to the generic [*defaultOnMsg* callback](#received-message-callbacks), if either have been registered. 
+This method enables UBX messages of the specified ID to be received at the specified rate. When messages are received, they will be passed to the function passed into the *callback* parameter. If no such message-specific callback has been provided (it is optional), messages will instead be passed either to the type-specific [*onUbxMsg* callback](#received-message-callbacks) or to the generic [*defaultOnMsg* callback](#received-message-callbacks), if either have been registered.
 
 For more information, please see [‘Received Message Callbacks’](#received-message-callbacks), above.
 
@@ -97,7 +97,7 @@ Nothing.
 
 ### registerOnMessageCallback(*IDorType, callback*) ###
 
-This method registers a message-specific or type-specific callback that will handle messages of the specified ID or type when they are received from the M8N. 
+This method registers a message-specific or type-specific callback that will handle messages of the specified ID or type when they are received from the M8N.
 
 For more information, please see [‘Received Message Callbacks’](#received-message-callbacks), above.
 
@@ -116,7 +116,7 @@ Nothing.
 
 ### writeUBX(*classID, payload*) ###
 
-This method writes a UBX protocol packet to the M8N. 
+This method writes a UBX protocol packet to the M8N.
 
 **Note** If your command provides a response, be sure you have a suitable callback registered.
 
@@ -173,7 +173,7 @@ This method calculates the checksum for a UBX packet. The packet must consist of
 
 String &mdash; the two-byte checksum.
 
-### calcNMEACheckSum(*sentence*) ###
+### calcNmeaChecksum(*sentence*) ###
 
 This method calculates the checksum for an NMEA sentence. It will ignore start and end characters if they have been included in the specified sentence.
 
