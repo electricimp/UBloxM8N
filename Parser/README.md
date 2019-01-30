@@ -15,7 +15,7 @@ There are [two helper methods](#class-methods) available to convert the integer 
 The remaining slots in the parser table are identified by 16-bit integers: the UBX message class ID. For example, to parse the payload of a UBX message of type NAV_PVT, you would call:
 
 ```squirrel
-local result = UbxMsgParser[0x0107](payload)
+local result = UbxMsgParser[0x0107](payload);
 ```
 
 where *payload* is the message data and *result* is the parsed information, returned as a table.
