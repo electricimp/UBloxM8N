@@ -142,6 +142,18 @@ class UbxParserTests extends ImpTestCase {
         return "No setUp needed for this test";
     }
 
+    function testLatLngStr() {
+        local lat = 0x164a1afb;
+        local lon = 0xb738aa44;
+        local expLat = "37.3955323 N";
+        local expLon = "122.1023164 W";
+
+        assertEqual(expLat, UbxMsgParser.getLatStr(lat));
+        assertEqual(expLon, UbxMsgParser.getLonStr(lon));
+
+        return "getLatStr and getLonStr methods returned expected values";
+    }
+
     function testNavPvtValid() {
         // binary: d0 09 b7 19 e3 07 01 18 17 32 08 f7 f7 03 00 00 a6 6c 02 00 03 01 0a 0b 44 aa 38 b7 fb 1a 4a 16 4b 5a 00 00 8a cf 00 00 2a 18 00 00 d7 10 00 00 f9 ff ff ff f9 ff ff ff fd ff ff ff 0a 00 00 00 00 00 00 00 61 01 00 00 14 6e 01 01 9a 00 00 e0 86 4c 22 00 00 00 02 00 00 00 00 80
         // Tests all fields are present and are expected type & value

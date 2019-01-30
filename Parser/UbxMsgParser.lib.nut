@@ -51,6 +51,23 @@ enum UBX_MSG_PARSER_CLASS_MSG_ID {
 UbxMsgParser <- {
     "VERSION" : "1.0.0",
     "ERROR_PARSING" : "Error: Could not parse payload, %s",
+
+    "getLatStr" : function(ubxLat) {
+        local lad = (ubxLat >= 0) ? 'N' : 'S';
+        return _formatLatLonStr(lad, ubxLat);
+    },
+
+    "getLonStr" : function(ubxLon) {
+        local lod = (ubxLon >= 0) ? 'E' : 'W';
+        return _formatLatLonStr(lod, ubxLon);
+    },
+
+    "_formatLatLonStr" : function(dir, deg) {
+        if (deg < 0) deg =- deg;
+        local d1 = deg / 10000000, d2 = deg % 10000000;
+
+        return format("%d.%07d %c", d1, d2, dir);
+    }
 }
 
 /**

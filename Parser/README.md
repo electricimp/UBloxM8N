@@ -10,11 +10,39 @@ This parser is a table, so command parsing functions can be added and customized
 
 No initialization is needed to use the parser's functions.
 
-All slots in this table are 2 byte integers, the UBX message class and id. The values for each slot are the parsing function. Each parsing function takes the UBX message payload and returns a table. The parsed tables will always contain an *error* and a *payload* slot. If no error was encountered when parsing the payload additional parameters will be included in the table. Users should always check the error parameter before accessing the other table slots.
+There are two helper methods to convert the integer latitude and longitude values returned by UBX methods to the more commonly formatted strings. All other slots in this table are 2 byte integers, the UBX message class and id. The values for each slot are the parsing function. Each parsing function takes the UBX message payload and returns a table. The parsed tables will always contain an *error* and a *payload* slot. If no error was encountered when parsing the payload additional parameters will be included in the table. Users should always check the error parameter before accessing the other table slots.
 
 **Note:** Squirrel only supports signed 32 bit integers. If the paylaod conatins a 32 bit unsigned integer the parsed table will contain a 4 byte blob with the payload values. These values are in the same order as received by the M8N (little endian).
 
 ## Class Methods ##
+
+### getLatStr(ubxLat) ###
+
+Takes the integer Latitude value from a UBX method and returns a decimal degree Latitude string, ie "37.3955323 N".
+
+#### Parameters ####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *ubxLat* | integer | Yes | Latitude integer in parsed UBX message. |
+
+#### Return Value ####
+
+A string.
+
+### getLonStr(ubxLon) ###
+
+Takes the integer Longitude value from a UBX method and returns a decimal degree Longitude string, ie "122.1023164 W".
+
+#### Parameters ####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *ubxLon* | integer | Yes | Longitude integer in parsed UBX message. |
+
+#### Return Value ####
+
+A string.
 
 ### 0x0107(*payload*) ###
 
