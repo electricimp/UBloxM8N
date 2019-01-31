@@ -25,71 +25,7 @@
 @include __PATH__+"/../Driver/UbloxM8N.device.lib.nut"
 @include __PATH__+"/StubbedUart.device.nut"
 
-class StubbedUart {
-
-    _cb = null;
-    _br = null;
-    rPtr = 0;
-    _rBuff = null;
-    _wBuff = "";
-
-    // API methods
-    // -------------------------------------------------
-
-    function configure(baudRate, wordSize, parity, stopBits, ctsRts, callback) {
-        _cb = callback;
-        _br = baudRate;
-        // NOTE: Do not reset write buffer when configuring - only reset on clearWriteBuffer
-        // This allows us to test commands in the UBX Driver configure method.
-    }
-
-    function flush() {
-        // Not needed since we are not actually sending anything down the wire
-    }
-
-    function write(data) {
-        // Stores all incoming data as a string
-        // server.log(data);
-        _wBuff += data.tostring();
-    }
-
-    function read() {
-        if (_rBuff == null || _rBuff.len() == 0 || rPtr >= _rBuff.len()) {
-            _rBuff = null;
-            rPtr = 0;
-            return -1;
-        }
-
-        return _rBuff[rPtr++];
-    }
-
-    // Custom test helpers
-    // -------------------------------------------------
-
-    // Writes data to read buffer and triggers callback
-    function setReadBuffer(data) {
-        switch(typeof data) {
-            case "string":
-                _rBuff = blob(data.len());
-                _rBuff.writestring(data);
-                if (_cb) _cb();
-                break;
-            case "blob":
-                _rBuff = data;
-                if (_cb) _cb();
-                break;
-        }
-    }
-
-    // Returns write buffer
-    function getWriteBuffer() {
-        return _wBuff;
-    }
-
-    function clearWriteBuffer() {
-        _wBuff = "";
-    }
-}
+const READ_BUFFER_TIMEOUT = 5;
 
 class UbxM8NTests extends ImpTestCase {
 
@@ -124,7 +60,7 @@ class UbxM8NTests extends ImpTestCase {
         // Make sure buffer is empty after write(s), but before delay completed
         imp.wakeup(0, function() {
             local buff = delayUart.getWriteBuffer();
-            assertTrue(buff.len() == 0, "Write buffer was not empty, boot delay not not complete.");
+            assertEqual(0, buff.len(), "Write buffer was not empty, boot delay not not complete.");
         }.bindenv(this))
 
         return Promise(function(resolve, reject) {
@@ -144,10 +80,10 @@ class UbxM8NTests extends ImpTestCase {
 
         // Register a callback
         _ubx.registerOnMessageCallback(UBLOX_M8N_CONST.DEFAULT_ON_MSG, function(msg, id = null) {}.bindenv(this));
-        assertTrue(_ubx._msgHandlers.len() == 1);
+        assertEqual(1, _ubx._msgHandlers.len());
         assertTrue(UBLOX_M8N_CONST.DEFAULT_ON_MSG in _ubx._msgHandlers);
         _ubx.registerOnMessageCallback(UBLOX_M8N_CONST.DEFAULT_ON_MSG, null);
-        assertTrue(_ubx._msgHandlers.len() == 0);
+        assertEqual(0, _ubx._msgHandlers.len());
         assertTrue(!(UBLOX_M8N_CONST.DEFAULT_ON_MSG in _ubx._msgHandlers));
 
         return "Registering and unregistering message callback test passing.";
@@ -314,7 +250,7 @@ class UbxM8NTests extends ImpTestCase {
         _ubx.configure(opts);
 
         // No handlers were set
-        assertTrue(_ubx._msgHandlers.len() == 0, "Configure without onMessage callback unexpectedly set onMessage callbacks.");
+        assertEqual(0, _ubx._msgHandlers.len(), "Configure without onMessage callback unexpectedly set onMessage callbacks.");
         // Write buffer matches expected
         assertTrue(crypto.equals(expected, _testUart.getWriteBuffer()), "Expected configure write commands did not equal actual write buffer.");
         // Baud rate updated
@@ -346,10 +282,10 @@ class UbxM8NTests extends ImpTestCase {
         // Clear the write buffer
         _testUart.clearWriteBuffer();
         // Test andlers were set
-        assertTrue(_ubx._msgHandlers.len() == 3, "Configure with onMessage callback did not set any onMessage callbacks.");
-        assertTrue(_ubx._msgHandlers[UBLOX_M8N_CONST.DEFAULT_ON_MSG](null) == d, "Default onMessage not set to expected callback.");
-        assertTrue(_ubx._msgHandlers[UBLOX_M8N_CONST.ON_NMEA_MSG](null) == n, "NMEA onMessage not set to expected callback.");
-        assertTrue(_ubx._msgHandlers[UBLOX_M8N_CONST.ON_UBX_MSG](null, null) == u, "UBX onMessage not set to expected callback.");
+        assertEqual(3, _ubx._msgHandlers.len(), "Configure with onMessage callback did not set any onMessage callbacks.");
+        assertEqual(d, _ubx._msgHandlers[UBLOX_M8N_CONST.DEFAULT_ON_MSG](null), "Default onMessage not set to expected callback.");
+        assertEqual(n, _ubx._msgHandlers[UBLOX_M8N_CONST.ON_NMEA_MSG](null), "NMEA onMessage not set to expected callback.");
+        assertEqual(u, _ubx._msgHandlers[UBLOX_M8N_CONST.ON_UBX_MSG](null, null), "UBX onMessage not set to expected callback.");
 
         // Clear all onMessage handlers
         _ubx._msgHandlers = {};
@@ -372,10 +308,10 @@ class UbxM8NTests extends ImpTestCase {
         _ubx.enableUbxMsg(classId, rate, onMess.bindenv(this));
 
         // Check Handler
-        assertTrue(_ubx._msgHandlers.len() == 1, "No callbacks added to onMessage table");
+        assertEqual(1, _ubx._msgHandlers.len(), "No callbacks added to onMessage table");
         assertTrue(classId in _ubx._msgHandlers && _ubx._msgHandlers[classId](null, null) == expectedCBRtnVal, "Wrong onMessage Callback stored.");
         // Check Write buffer
-        assertTrue(expectedWriteBuff == _testUart.getWriteBuffer());
+        assertEqual(expectedWriteBuff, _testUart.getWriteBuffer());
         // Clear the write buffer
         _testUart.clearWriteBuffer();
 
@@ -384,7 +320,7 @@ class UbxM8NTests extends ImpTestCase {
         // Check Handler
         assertTrue(_ubx._msgHandlers.len() == 0 && !(classId in _ubx._msgHandlers), "Callback not removed from handlers");
         // Check Write buffer
-        assertTrue(expectedWriteBuff == _testUart.getWriteBuffer());
+        assertEqual(expectedWriteBuff, _testUart.getWriteBuffer());
         // Clear the write buffer
         _testUart.clearWriteBuffer();
 
@@ -408,10 +344,10 @@ class UbxM8NTests extends ImpTestCase {
         _ubx.enableUbxMsg(classId, rate, onMess.bindenv(this));
 
         // Check Handler
-        assertTrue(_ubx._msgHandlers.len() == 1, "No callbacks added to onMessage table");
+        assertEqual(1, _ubx._msgHandlers.len(), "No callbacks added to onMessage table");
         assertTrue(classId in _ubx._msgHandlers && _ubx._msgHandlers[classId](null, null) == expectedCBRtnVal, "Wrong onMessage Callback stored.");
         // Check Write buffer
-        assertTrue(expectedWriteBuff == _testUart.getWriteBuffer());
+        assertEqual(expectedWriteBuff, _testUart.getWriteBuffer());
         // Clear the write buffer
         _testUart.clearWriteBuffer();
 
@@ -421,7 +357,7 @@ class UbxM8NTests extends ImpTestCase {
         // Check Handler
         assertTrue(_ubx._msgHandlers.len() == 0 && !(classId in _ubx._msgHandlers), "Callback not removed from handlers");
         // Check Write buffer
-        assertTrue(expectedWriteBuff == _testUart.getWriteBuffer());
+        assertEqual(expectedWriteBuff, _testUart.getWriteBuffer());
         // Clear the write buffer
         _testUart.clearWriteBuffer();
 
@@ -448,7 +384,7 @@ class UbxM8NTests extends ImpTestCase {
         // Check Handler
         assertTrue(_ubx._msgHandlers.len() == 0 && !(classId in _ubx._msgHandlers), "Callback added to handlers when it shouldn't be.");
         // Check Write buffer
-        assertTrue(expectedWriteBuff == _testUart.getWriteBuffer());
+        assertEqual(expectedWriteBuff, _testUart.getWriteBuffer());
         // Clear the write buffer
         _testUart.clearWriteBuffer();
 
@@ -472,11 +408,11 @@ class UbxM8NTests extends ImpTestCase {
                 if (classId != null) {
                     // Check for expected UBX payload & classId
                     assertTrue(crypto.equals(expectedUBXPayload, msg), "UBX message did not match expected value");
-                    assertTrue(expectedUBXClassId == classId, "UBX class id did not match expected value");
+                    assertEqual(expectedUBXClassId, classId, "UBX class id did not match expected value");
                     receivedUBX = true;
                 } else {
                     // Check for expected NMEA sentence
-                    assertTrue(msg == NMEA, "NMEA sentence did not match expected value");
+                    assertEqual(NMEA, msg, "NMEA sentence did not match expected value");
                     receivedNMEA = true;
                 }
 
@@ -488,12 +424,12 @@ class UbxM8NTests extends ImpTestCase {
 
             // Trigger incoming uart data
             // NMEA packet
-            _testUart.setReadBuffer(NMEA);
+            _testUart.setAsyncReadBuffer(NMEA);
             // UBX sentence
-            _testUart.setReadBuffer(UBX);
+            _testUart.setAsyncReadBuffer(UBX);
 
             // Schedule Fail timeout
-            imp.wakeup(10, function() {
+            imp.wakeup(READ_BUFFER_TIMEOUT, function() {
                 _clearReceive();
                 return reject("General onMessage callback did not receive all expected messages");
             }.bindenv(this));
@@ -521,7 +457,7 @@ class UbxM8NTests extends ImpTestCase {
                     return reject("General message handler received a UBX message when it shouldn't.");
                 } else {
                     // Check for expected NMEA sentence
-                    assertTrue(msg == NMEA, "NMEA sentence did not match expected value");
+                    assertEqual(NMEA, msg, "NMEA sentence did not match expected value");
                     receivedNMEA = true;
                 }
             }.bindenv(this));
@@ -530,7 +466,7 @@ class UbxM8NTests extends ImpTestCase {
                 // UBX message should end up here NMEA should not
                 // Check for expected UBX payload & classId
                 assertTrue(crypto.equals(expectedUBXPayload, msg), "UBX message did not match expected value");
-                assertTrue(expectedUBXClassId == classId, "UBX class id did not match expected value");
+                assertEqual(expectedUBXClassId, classId, "UBX class id did not match expected value");
 
                 if (receivedNMEA) {
                     _clearReceive();
@@ -541,17 +477,14 @@ class UbxM8NTests extends ImpTestCase {
                 }
             }.bindenv(this))
 
-            // Trigger incoming uart data, use timer to ensure packet order
+            // Trigger incoming uart data
             // NMEA sentence
-            _testUart.setReadBuffer(NMEA);
-
-            imp.wakeup(1, function() {
-                // UBX packet
-                _testUart.setReadBuffer(UBX);
-            }.bindenv(this));
+            _testUart.setAsyncReadBuffer(NMEA);
+            // UBX packet
+            _testUart.setAsyncReadBuffer(UBX);
 
             // Schedule Fail timeout
-            imp.wakeup(10, function() {
+            imp.wakeup(READ_BUFFER_TIMEOUT, function() {
                 _clearReceive();
                 return reject("UBX onMessage test timed out before receiving all expected messages");
             }.bindenv(this));
@@ -585,7 +518,7 @@ class UbxM8NTests extends ImpTestCase {
             // Register NMEA handler
             _ubx.registerOnMessageCallback(UBLOX_M8N_CONST.ON_NMEA_MSG, function(msg) {
                 // Check for expected NMEA sentence
-                assertTrue(msg == NMEA, "NMEA sentence did not match expected value");
+                assertEqual(NMEA, msg, "NMEA sentence did not match expected value");
                 receivedNMEA = true;
             }.bindenv(this));
 
@@ -593,7 +526,7 @@ class UbxM8NTests extends ImpTestCase {
             _ubx.registerOnMessageCallback(UBLOX_M8N_CONST.ON_UBX_MSG, function(payload, classId) {
                 // Check for expected UBX payload & classId
                 assertTrue(crypto.equals(expectedPayloadUBX_1, payload), "UBX 1 message did not match expected value");
-                assertTrue(expectedClassIdUBX_1 == classId, "UBX 1 class id did not match expected value");
+                assertEqual(expectedClassIdUBX_1, classId, "UBX 1 class id did not match expected value");
                 receivedUBX_1 = true;
             }.bindenv(this));
 
@@ -611,23 +544,16 @@ class UbxM8NTests extends ImpTestCase {
                 }
             }.bindenv(this));
 
+            // Trigger incoming uart data
             // NMEA first -> NMEA handler
-            _testUart.setReadBuffer(NMEA);
-
+            _testUart.setAsyncReadBuffer(NMEA);
             // UBX_1 next -> UBX handler
-            imp.wakeup(1, function() {
-                // UBX_1 packet
-                _testUart.setReadBuffer(UBX_1);
-            }.bindenv(this));
-
+            _testUart.setAsyncReadBuffer(UBX_1);
             // UBX_2 last -> msg specific handler
-            imp.wakeup(2, function() {
-                // UBX_2 packet
-                _testUart.setReadBuffer(UBX_2);
-            }.bindenv(this));
+            _testUart.setAsyncReadBuffer(UBX_2);
 
             // Schedule Fail timeout
-            imp.wakeup(10, function() {
+            imp.wakeup(READ_BUFFER_TIMEOUT, function() {
                 _clearReceive();
                 return reject("UBX message specific onMessage test timed out before receiving all expected messages");
             }.bindenv(this));
@@ -652,7 +578,7 @@ class UbxM8NTests extends ImpTestCase {
                 if (classId != null) {
                     // Check for expected UBX payload & classId
                     assertTrue(crypto.equals(expectedUBXPayload, msg), "UBX message did not match expected value");
-                    assertTrue(expectedUBXClassId == classId, "UBX class id did not match expected value");
+                    assertEqual(expectedUBXClassId, classId, "UBX class id did not match expected value");
                     receivedUBX = true;
                 } else {
                     // Fail test if NMEA message is received
@@ -666,7 +592,7 @@ class UbxM8NTests extends ImpTestCase {
                 // NMEA message should end up here UBX should not
 
                 // Check for expected NMEA sentence
-                assertTrue(msg == NMEA, "NMEA sentence did not match expected value");
+                assertEqual(NMEA, msg, "NMEA sentence did not match expected value");
 
                 if (receivedUBX) {
                     _clearReceive();
@@ -677,17 +603,14 @@ class UbxM8NTests extends ImpTestCase {
                 }
             }.bindenv(this))
 
-            // Trigger incoming uart data, use timer to ensure packet order
+            // Trigger incoming uart data
             // UBX packet
-            _testUart.setReadBuffer(UBX);
-
-            imp.wakeup(1, function() {
-                // NMEA sentence
-                _testUart.setReadBuffer(NMEA);
-            }.bindenv(this));
+            _testUart.setAsyncReadBuffer(UBX);
+            // NMEA sentence
+            _testUart.setAsyncReadBuffer(NMEA);
 
             // Schedule Fail timeout
-            imp.wakeup(10, function() {
+            imp.wakeup(READ_BUFFER_TIMEOUT, function() {
                 _clearReceive();
                 return reject("NMEA onMessage test timed out before receiving all expected messages");
             }.bindenv(this));
@@ -696,7 +619,7 @@ class UbxM8NTests extends ImpTestCase {
 
     function _clearReceive() {
         _ubx._msgHandlers = {};
-        _testUart.setReadBuffer(null);
+        _testUart.clearReadBuffer();
     }
 
     function tearDown() {

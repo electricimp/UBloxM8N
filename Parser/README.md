@@ -10,7 +10,7 @@ The parser is implemented as a table, so command-parsing functions can be added 
 
 No initialization is needed to use the parser, which is implemented as a table that is accessed via the global variable *UbxMsgParser*.
 
-There are [two helper methods](#class-methods) available to convert the integer latitude and longitude values returned by UBX methods to strings in the more common format for this data. 
+There is [on helper method](#class-methods) available to convert the integer latitude and longitude values returned by UBX methods to a decimal degree string, a more common form for this data.
 
 The remaining slots in the parser table are identified by 16-bit integers: the UBX message class ID. For example, to parse the payload of a UBX message of type NAV_PVT, you would call:
 
@@ -20,39 +20,25 @@ local result = UbxMsgParser[0x0107](payload);
 
 where *payload* is the message data and *result* is the parsed information, returned as a table.
 
-The value of each slot is the relevant parsing function. Each parsing function takes the UBX message payload and returns a table. The parsed tables will always contain *error* and *payload* slots. If no error was encountered when parsing the payload, additional parameters will be included in the table. Users should always check the *error* value before accessing the other slots.
+The value of each slot is the relevant parsing function. Each parsing function takes the UBX message payload and returns a table. The parsed tables will always contain *error* and *payload* slots. If no error was encountered when parsing the payload, the *error* slot will be `null` and additional slots will be included in the table. Users should always check the *error* value before accessing the other slots.
 
 **Note** Squirrel only supports signed 32-bit integers. If the payload contains a 32-bit unsigned integer, the parsed table will contain a four-byte blob with the payload values. These values will be in the same order as received by the M8N (little endian).
 
 ## Class Methods ##
 
-### getLatStr(*UBXlatitude*) ###
+### toDecimalDegreeString(*UBXdegrees*) ###
 
-This method converts an integer UBX latitude value into a decimal degree latitude string, eg. `"37.3955323 N"`.
-
-#### Parameters ####
-
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| *UBXlatitude* | Integer | Yes | Latitude integer from a parsed UBX message |
-
-#### Returns ####
-
-String &mdash; the decimal degree latitude.
-
-### getLonStr(*UBXlongitude*) ###
-
-This method converts an integer UBX longitude value into a decimal degree longitude string, eg. `"122.1023164 W"`.
+This method converts an integer UBX latitude or longitude value into a decimal degree string, eg. `"37.3955323"` or `"-122.1023164"`.
 
 #### Parameters ####
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| *UBXlongitude* | Integer | Yes | Longitude integer from a parsed UBX message |
+| *UBXdegrees* | Integer | Yes | Latitude or Longitude integer from a parsed UBX message |
 
 #### Returns ####
 
-String &mdash; the decimal degree longitude.
+String &mdash; the decimal degree latitude or longitude.
 
 ### 0x0107(*payload*) ###
 

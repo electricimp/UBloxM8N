@@ -142,16 +142,16 @@ class UbxParserTests extends ImpTestCase {
         return "No setUp needed for this test";
     }
 
-    function testLatLngStr() {
+    function testToDecimalDegreeString() {
         local lat = 0x164a1afb;
         local lon = 0xb738aa44;
-        local expLat = "37.3955323 N";
-        local expLon = "122.1023164 W";
+        local expLat = "37.3955323";
+        local expLon = "-122.1023164";
 
-        assertEqual(expLat, UbxMsgParser.getLatStr(lat));
-        assertEqual(expLon, UbxMsgParser.getLonStr(lon));
+        assertEqual(expLat, UbxMsgParser.toDecimalDegreeString(lat));
+        assertEqual(expLon, UbxMsgParser.toDecimalDegreeString(lon));
 
-        return "getLatStr and getLonStr methods returned expected values";
+        return "toDecimalDegreeString method returned expected values";
     }
 
     function testNavPvtValid() {
@@ -167,22 +167,22 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(crypto.equals("\xd0\x09\xb7\x19", parsed.iTOW), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "iTOW"));
 
         assertTrue("year" in parsed && typeof parsed.year == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "year"));
-        assertTrue(2019 == parsed.year, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "year"));
+        assertEqual(2019, parsed.year, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "year"));
 
         assertTrue("month" in parsed && typeof parsed.month == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "month"));
-        assertTrue(1 == parsed.month, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "month"));
+        assertEqual(1, parsed.month, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "month"));
 
         assertTrue("day" in parsed && typeof parsed.day == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "day"));
-        assertTrue(0x18 == parsed.day, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "day"));
+        assertEqual(0x18, parsed.day, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "day"));
 
         assertTrue("hour" in parsed && typeof parsed.hour == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "hour"));
-        assertTrue(0x17 == parsed.hour, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hour"));
+        assertEqual(0x17, parsed.hour, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hour"));
 
         assertTrue("min" in parsed && typeof parsed.min == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "min"));
-        assertTrue(0x32 == parsed.min, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "min"));
+        assertEqual(0x32, parsed.min, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "min"));
 
         assertTrue("sec" in parsed && typeof parsed.sec == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "sec"));
-        assertTrue(0x08 == parsed.sec, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "sec"));
+        assertEqual(0x08, parsed.sec, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "sec"));
 
         assertTrue("valid" in parsed && typeof parsed.valid == "table", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "valid"));
         local valid = parsed.valid; // 0xf7
@@ -195,10 +195,10 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(crypto.equals("\xf7\x03\x00\x00", parsed.tAcc), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "tAcc"));
 
         assertTrue("nano" in parsed && typeof parsed.nano == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "nano"));
-        assertTrue(0x00026ca6 == parsed.nano, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "nano"));
+        assertEqual(0x00026ca6, parsed.nano, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "nano"));
 
         assertTrue("fixType" in parsed && typeof parsed.fixType == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "fixType"));
-        assertTrue(0x03 == parsed.fixType, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "fixType"));
+        assertEqual(0x03, parsed.fixType, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "fixType"));
 
         assertTrue("fixStatusFlags" in parsed && typeof parsed.fixStatusFlags == "table", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "fixStatusFlags"));
         local flags = parsed.fixStatusFlags; // 0x01 0x0a
@@ -212,19 +212,19 @@ class UbxParserTests extends ImpTestCase {
         assertTrue("confirmedTime" in flags && !flags.confirmedTime, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "confirmedTime"));
 
         assertTrue("numSV" in parsed && typeof parsed.numSV == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "numSV"));
-        assertTrue(0x0b == parsed.numSV, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "numSV"));
+        assertEqual(0x0b, parsed.numSV, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "numSV"));
 
         assertTrue("lon" in parsed && typeof parsed.lon == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "lon"));
-        assertTrue(0xb738aa44 == parsed.lon, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "lon"));
+        assertEqual(0xb738aa44, parsed.lon, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "lon"));
 
         assertTrue("lat" in parsed && typeof parsed.lat == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "lat"));
-        assertTrue(0x164a1afb == parsed.lat, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "lat"));
+        assertEqual(0x164a1afb, parsed.lat, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "lat"));
 
         assertTrue("height" in parsed && typeof parsed.height == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "height"));
-        assertTrue(0x00005a4b == parsed.height, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "height"));
+        assertEqual(0x00005a4b, parsed.height, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "height"));
 
         assertTrue("hMSL" in parsed && typeof parsed.hMSL == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "hMSL"));
-        assertTrue(0x0000cf8a == parsed.hMSL, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hMSL"));
+        assertEqual(0x0000cf8a, parsed.hMSL, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hMSL"));
 
         assertTrue("hAcc" in parsed && typeof parsed.hAcc == "blob", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "hAcc"));
         assertTrue(crypto.equals("\x2a\x18\x00\x00", parsed.hAcc), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hAcc"));
@@ -233,19 +233,19 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(crypto.equals("\xd7\x10\x00\x00", parsed.vAcc), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "vAcc"));
 
         assertTrue("velN" in parsed && typeof parsed.velN == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "velN"));
-        assertTrue(0xfffffff9 == parsed.velN, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "velN"));
+        assertEqual(0xfffffff9, parsed.velN, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "velN"));
 
         assertTrue("velE" in parsed && typeof parsed.velE == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "velE"));
-        assertTrue(0xfffffff9 == parsed.velE, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "velE"));
+        assertEqual(0xfffffff9, parsed.velE, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "velE"));
 
         assertTrue("velD" in parsed && typeof parsed.velD == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "velD"));
-        assertTrue(0xfffffffd == parsed.velD, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "velD"));
+        assertEqual(0xfffffffd, parsed.velD, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "velD"));
 
         assertTrue("gSpeed" in parsed && typeof parsed.gSpeed == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "gSpeed"));
-        assertTrue(0x0000000a == parsed.gSpeed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "gSpeed"));
+        assertEqual(0x0000000a, parsed.gSpeed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "gSpeed"));
 
         assertTrue("headMot" in parsed && typeof parsed.headMot == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "headMot"));
-        assertTrue(0x00000000 == parsed.headMot, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "headMot"));
+        assertEqual(0x00000000, parsed.headMot, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "headMot"));
 
         assertTrue("sAcc" in parsed && typeof parsed.sAcc == "blob", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "sAcc"));
         assertTrue(crypto.equals("\x61\x01\x00\x00", parsed.sAcc), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "sAcc"));
@@ -254,16 +254,16 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(crypto.equals("\x14\x6e\x01\x01", parsed.headAcc), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "headAcc"));
 
         assertTrue("pDOP" in parsed && typeof parsed.pDOP == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pDOP"));
-        assertTrue(0x009a == parsed.pDOP, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pDOP"));
+        assertEqual(0x009a, parsed.pDOP, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pDOP"));
 
         assertTrue("headVeh" in parsed && typeof parsed.headVeh == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "headVeh"));
-        assertTrue(0x00020000 == parsed.headVeh, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "headVeh"));
+        assertEqual(0x00020000, parsed.headVeh, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "headVeh"));
 
         assertTrue("magDec" in parsed && typeof parsed.magDec == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "magDec"));
-        assertTrue(0x0000 == parsed.magDec, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "magDec"));
+        assertEqual(0x0000, parsed.magDec, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "magDec"));
 
         assertTrue("magAcc" in parsed && typeof parsed.magAcc == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "magAcc"));
-        assertTrue(0x8000 == parsed.magAcc, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "magAcc"));
+        assertEqual(0x8000, parsed.magAcc, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "magAcc"));
 
         return "Valid NAV-PVT message parse test passed.";
     }
@@ -292,10 +292,10 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(crypto.equals("\xe8\x03\x00\x00", parsed.iTOW), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "iTOW"));
 
         assertTrue("version" in parsed && typeof parsed.version == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "version"));
-        assertTrue(0x01 == parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
+        assertEqual(0x01, parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
 
         assertTrue("numSvs" in parsed && typeof parsed.numSvs == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "numSvs"));
-        assertTrue(0 == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "numSvs"));
+        assertEqual(0, parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "numSvs"));
 
         assertTrue("satInfo" in parsed && typeof parsed.satInfo == "array", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "satInfo"));
         assertTrue(parsed.satInfo.len() == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo"));
@@ -316,10 +316,10 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(crypto.equals("\x30\xf4\xb7\x19", parsed.iTOW), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "iTOW"));
 
         assertTrue("version" in parsed && typeof parsed.version == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "version"));
-        assertTrue(0x01 == parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
+        assertEqual(0x01, parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
 
         assertTrue("numSvs" in parsed && typeof parsed.numSvs == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "numSvs"));
-        assertTrue(0x17 == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "numSvs"));
+        assertEqual(0x17, parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "numSvs"));
 
         assertTrue("satInfo" in parsed && typeof parsed.satInfo == "array", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "satInfo"));
         assertTrue(parsed.satInfo.len() == parsed.numSvs, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo"));
@@ -560,43 +560,43 @@ class UbxParserTests extends ImpTestCase {
         foreach (idx, sat in parsed.satInfo) {
             local ex = expected[idx];
             assertTrue("gnssId" in sat && typeof sat.gnssId == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "gnssId"));
-            assertTrue(ex.gnssId == sat.gnssId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " gnssId"));
+            assertEqual(ex.gnssId, sat.gnssId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " gnssId"));
 
             assertTrue("svId" in sat && typeof sat.svId == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "svId"));
-            assertTrue(ex.svId == sat.svId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " svId"));
+            assertEqual(ex.svId, sat.svId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " svId"));
 
             assertTrue("cno" in sat && typeof sat.cno == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "cno"));
-            assertTrue(ex.cno == sat.cno, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " cno"));
+            assertEqual(ex.cno, sat.cno, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " cno"));
 
             assertTrue("elev" in sat && typeof sat.elev == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "elev"));
-            assertTrue(ex.elev == sat.elev, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " elev"));
+            assertEqual(ex.elev, sat.elev, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " elev"));
 
             assertTrue("azim" in sat && typeof sat.azim == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "azim"));
-            assertTrue(ex.azim == sat.azim, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " azim"));
+            assertEqual(ex.azim,sat.azim, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " azim"));
 
             assertTrue("prRes" in sat && typeof sat.prRes == "integer", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "prRes"));
-            assertTrue(ex.prRes == sat.prRes, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " prRes"));
+            assertEqual(ex.prRes, sat.prRes, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " prRes"));
 
             assertTrue("flags" in sat && typeof sat.flags == "table", format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "satInfo " + idx + " flags"));
 
             local flags = sat.flags;
             local exFlags = ex.flags;
-            assertTrue(flags.qualityInd == exFlags.qualityInd, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags qualityInd"));
-            assertTrue(flags.svUsed == exFlags.svUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags svUsed"));
-            assertTrue(flags.health == exFlags.health, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags health"));
-            assertTrue(flags.diffCorr == exFlags.diffCorr, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags diffCorr"));
-            assertTrue(flags.smoothed == exFlags.smoothed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags smoothed"));
-            assertTrue(flags.orbitSource == exFlags.orbitSource, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags orbitSource"));
-            assertTrue(flags.ephAvail == exFlags.ephAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags ephAvail"));
-            assertTrue(flags.almAvail == exFlags.almAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags almAvail"));
-            assertTrue(flags.anoAvail == exFlags.anoAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags anoAvail"));
-            assertTrue(flags.aopAvail == exFlags.aopAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags aopAvail"));
-            assertTrue(flags.sbasCorrUsed == exFlags.sbasCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags sbasCorrUsed"));
-            assertTrue(flags.rtcmCorrUsed == exFlags.rtcmCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags rtcmCorrUsed"));
-            assertTrue(flags.slasCorrUsed == exFlags.slasCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags slasCorrUsed"));
-            assertTrue(flags.prCorrUsed == exFlags.prCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags prCorrUsed"));
-            assertTrue(flags.crCorrUsed == exFlags.crCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags crCorrUsed"));
-            assertTrue(flags.doCorrUsed == exFlags.doCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags doCorrUsed"));
+            assertEqual(flags.qualityInd, exFlags.qualityInd, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags qualityInd"));
+            assertEqual(flags.svUsed, exFlags.svUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags svUsed"));
+            assertEqual(flags.health, exFlags.health, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags health"));
+            assertEqual(flags.diffCorr, exFlags.diffCorr, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags diffCorr"));
+            assertEqual(flags.smoothed, exFlags.smoothed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags smoothed"));
+            assertEqual(flags.orbitSource, exFlags.orbitSource, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags orbitSource"));
+            assertEqual(flags.ephAvail, exFlags.ephAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags ephAvail"));
+            assertEqual(flags.almAvail, exFlags.almAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags almAvail"));
+            assertEqual(flags.anoAvail, exFlags.anoAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags anoAvail"));
+            assertEqual(flags.aopAvail, exFlags.aopAvail, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags aopAvail"));
+            assertEqual(flags.sbasCorrUsed, exFlags.sbasCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags sbasCorrUsed"));
+            assertEqual(flags.rtcmCorrUsed, exFlags.rtcmCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags rtcmCorrUsed"));
+            assertEqual(flags.slasCorrUsed, exFlags.slasCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags slasCorrUsed"));
+            assertEqual(flags.prCorrUsed, exFlags.prCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags prCorrUsed"));
+            assertEqual(flags.crCorrUsed, exFlags.crCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags crCorrUsed"));
+            assertEqual(flags.doCorrUsed, exFlags.doCorrUsed, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "satInfo " + idx + " flags doCorrUsed"));
         }
 
         return "Valid NAV-SAT message with satInfo parse test passed.";
@@ -623,7 +623,7 @@ class UbxParserTests extends ImpTestCase {
         assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
 
         assertTrue("ackMsgClassId" in parsed && (typeof parsed.ackMsgClassId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "ackMsgClassId"));
-        assertTrue(0x0601 == parsed.ackMsgClassId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "ackMsgClassId"));
+        assertEqual(0x0601, parsed.ackMsgClassId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "ackMsgClassId"));
 
         return "Valid ACK-ACK message parse test passed.";
     }
@@ -649,7 +649,7 @@ class UbxParserTests extends ImpTestCase {
         assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
 
         assertTrue("nakMsgClassId" in parsed && (typeof parsed.nakMsgClassId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "nakMsgClassId"));
-        assertTrue(0x0601 == parsed.nakMsgClassId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "nakMsgClassId"));
+        assertEqual(0x0601, parsed.nakMsgClassId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "nakMsgClassId"));
 
         return "Valid ACK-NAK message parse test passed.";
     }
@@ -675,9 +675,9 @@ class UbxParserTests extends ImpTestCase {
         assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
 
         assertTrue("swVersion" in parsed && (typeof parsed.swVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "swVersion"));
-        assertTrue("2.01 (75331)" == parsed.swVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "swVersion"));
+        assertEqual("2.01 (75331)", parsed.swVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "swVersion"));
         assertTrue("hwVersion" in parsed && (typeof parsed.hwVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "hwVersion"));
-        assertTrue("00080000" == parsed.hwVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hwVersion"));
+        assertEqual("00080000", parsed.hwVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hwVersion"));
 
         local expectedExSwInfo = [
             "PROTVER 15.00",
@@ -687,7 +687,7 @@ class UbxParserTests extends ImpTestCase {
 
         assertTrue("exSwInfo" in parsed && (typeof swInfo == "array"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "exSwInfo"));
         foreach(idx, infoStr in swInfo) {
-            assertTrue(expectedExSwInfo[idx] == infoStr, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "exSwInfo at index " + idx));
+            assertEqual(expectedExSwInfo[idx], infoStr, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "exSwInfo at index " + idx));
         }
 
         return "Valid MON-VER message with extended info parse test passed.";
@@ -703,9 +703,9 @@ class UbxParserTests extends ImpTestCase {
         assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
 
         assertTrue("swVersion" in parsed && (typeof parsed.swVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "swVersion"));
-        assertTrue("2.01 (75331)" == parsed.swVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "swVersion"));
+        assertEqual("2.01 (75331)", parsed.swVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "swVersion"));
         assertTrue("hwVersion" in parsed && (typeof parsed.hwVersion == "string"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "hwVersion"));
-        assertTrue("00080000" == parsed.hwVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hwVersion"));
+        assertEqual("00080000", parsed.hwVersion, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "hwVersion"));
         assertTrue(!("exSwInfo" in parsed), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "exSwInfo"));
 
         return "Valid MON-VER message without extended info parse test passed.";
@@ -745,16 +745,16 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(crypto.equals("\xef\xf7\x00\x00", parsed.pinVal), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pinVal"));
 
         assertTrue("noisePerMS" in parsed && (typeof parsed.noisePerMS == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "noisePerMS"));
-        assertTrue(0x006c == parsed.noisePerMS, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "noisePerMS"));
+        assertEqual(0x006c, parsed.noisePerMS, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "noisePerMS"));
 
         assertTrue("agcCnt" in parsed && (typeof parsed.agcCnt == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "agcCnt"));
-        assertTrue(0x0000 == parsed.agcCnt, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "agcCnt"));
+        assertEqual(0x0000, parsed.agcCnt, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "agcCnt"));
 
         assertTrue("aStatus" in parsed && (typeof parsed.aStatus == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "aStatus"));
-        assertTrue(0x00 == parsed.aStatus, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "aStatus"));
+        assertEqual(0x00, parsed.aStatus, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "aStatus"));
 
         assertTrue("aPower" in parsed && (typeof parsed.aPower == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "aPower"));
-        assertTrue(0x01 == parsed.aPower, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "aPower"));
+        assertEqual(0x01, parsed.aPower, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "aPower"));
 
         assertTrue("flags" in parsed && (typeof parsed.flags == "table"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "flags"));
 
@@ -767,16 +767,16 @@ class UbxParserTests extends ImpTestCase {
         local flags = parsed.flags;
 
         assertTrue("rtcCalib" in flags && (typeof flags.rtcCalib == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "rtcCalib"));
-        assertTrue(0 == flags.rtcCalib, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "rtcCalib flag"));
+        assertEqual(0, flags.rtcCalib, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "rtcCalib flag"));
 
         assertTrue("safeBoot" in flags && (typeof flags.safeBoot == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "safeBoot"));
-        assertTrue(0 == flags.safeBoot, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "safeBoot flag"));
+        assertEqual(0, flags.safeBoot, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "safeBoot flag"));
 
         assertTrue("jammingState" in flags && (typeof flags.jammingState == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "jammingState"));
-        assertTrue(0 == flags.jammingState, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "jammingState flag"));
+        assertEqual(0, flags.jammingState, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "jammingState flag"));
 
         assertTrue("xtalAbsent" in flags && (typeof flags.safeBoot == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "xtalAbsent"));
-        assertTrue(0 == flags.safeBoot, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "xtalAbsent flag"));
+        assertEqual(0, flags.safeBoot, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "xtalAbsent flag"));
 
         assertTrue("usedMask" in parsed && (typeof parsed.usedMask == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "usedMask"));
         assertTrue(crypto.equals("\xff\xeb\x01\x00", parsed.usedMask), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "usedMask"));
@@ -785,7 +785,7 @@ class UbxParserTests extends ImpTestCase {
         assertTrue(crypto.equals("\x0a\x0b\x0c\x0d\x0e\x0f\x01\x00\x02\x03\xff\x10\xff\x12\x13\x36\x35", parsed.vp), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "vp"));
 
         assertTrue("jamInd" in parsed && (typeof parsed.jamInd == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "jamInd"));
-        assertTrue(0x00 == parsed.jamInd, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "jamInd"));
+        assertEqual(0x00, parsed.jamInd, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "jamInd"));
 
         assertTrue("pinIrq" in parsed && (typeof parsed.pinIrq == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "pinIrq"));
         assertTrue(crypto.equals("\x00\x00\x00\x00", parsed.pinIrq), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "pinIrq"));
@@ -820,16 +820,16 @@ class UbxParserTests extends ImpTestCase {
         assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
 
         assertTrue("type" in parsed && (typeof parsed.type == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "type"));
-        assertTrue(0x01 == parsed.type, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "type"));
+        assertEqual(0x01, parsed.type, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "type"));
 
         assertTrue("version" in parsed && (typeof parsed.version == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "version"));
-        assertTrue(0x00 == parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
+        assertEqual(0x00, parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
 
         assertTrue("infoCode" in parsed && (typeof parsed.infoCode == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "infoCode"));
-        assertTrue(0x00 == parsed.infoCode, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "infoCode"));
+        assertEqual(0x00, parsed.infoCode, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "infoCode"));
 
         assertTrue("msgId" in parsed && (typeof parsed.msgId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "msgId"));
-        assertTrue(0x06 == parsed.msgId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "msgId"));
+        assertEqual(0x06, parsed.msgId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "msgId"));
 
         assertTrue("msgPayloadStart" in parsed && (typeof parsed.msgPayloadStart == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "msgPayloadStart"));
         assertTrue(crypto.equals("\x02\x00\x18\x00", parsed.msgPayloadStart), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "msgPayloadStart"));

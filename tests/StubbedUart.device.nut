@@ -64,7 +64,7 @@ class StubbedUart {
     // -------------------------------------------------
 
     // Writes data to read buffer and triggers callback
-    function setReadBuffer(data) {
+    function setSyncReadBuffer(data) {
         switch(typeof data) {
             case "string":
                 _rBuff = blob(data.len());
@@ -76,6 +76,41 @@ class StubbedUart {
                 if (_cb) _cb();
                 break;
         }
+    }
+
+    function setAsyncReadBuffer(data) {
+        local tod = typeof data;
+        if (!(tod == "string" || tod == "blob")) return;
+
+        // Update read buffer size
+        if (_rBuff == null) {
+            _rBuff = blob(data.len());
+        } else {
+            _rBuff.seek(0, 'e');
+            _rBuff.resize(_rBuff.len() + data.len());
+        }
+
+        // Append data
+        switch(tod) {
+            case "string":
+                _rBuff.writestring(data);
+                break;
+            case "blob" :
+                _rBuff.writeblob(data);
+                break;
+        }
+
+        // Move pointer to next read
+        _rBuff.seek(rPtr, 'b');
+
+        server.log(_rBuff);
+
+        // Trigger callback
+        if (_cb) imp.wakeup(0, _cb);
+    }
+
+    function clearReadBuffer() {
+        _rBuff = null;
     }
 
     // Returns write buffer
