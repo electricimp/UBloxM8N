@@ -124,7 +124,10 @@ function navMsgHandler(payload) {
     logUBX(parsed);
 
     if (lat in parsed && lon in parsed) {
-    server.log(format("Lat: %s, Lon: %s", UbxMsgParser.getLatStr(parsed.lat), UbxMsgParser.getLonStr(parsed.lon)));
+        server.log(format("Lat: %s, Lon: %s",
+            UbxMsgParser.toDecimalDegreeString(parsed.lat),
+            UbxMsgParser.toDecimalDegreeString(parsed.lon)));
+    }
     server.log("--------------------------------------------");
 }
 
