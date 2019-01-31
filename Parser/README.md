@@ -10,9 +10,9 @@ The parser is implemented as a table, so command-parsing functions can be added 
 
 No initialization is needed to use the parser, which is implemented as a table that is accessed via the global variable *UbxMsgParser*.
 
-There is [on helper method](#class-methods) available to convert the integer latitude and longitude values returned by UBX methods to a decimal degree string, a more common form for this data.
+There is [one helper method](#class-methods) available to convert the integer latitude and longitude values returned by UBX methods to a decimal degree string, a more common foramt for this data.
 
-The remaining slots in the parser table are identified by 16-bit integers: the UBX message class ID. For example, to parse the payload of a UBX message of type NAV_PVT, you would call:
+The remaining slots in the parser table are identified by 16-bit integers: the UBX class message ID. For example, to parse the payload of a UBX message of type NAV_PVT, you would call:
 
 ```squirrel
 local result = UbxMsgParser[0x0107](payload);
@@ -67,7 +67,7 @@ Table &mdash; contains the following keys:
 | *sec* | Integer | Seconds of minute in range 0-60 (UTC) |
 | *valid* | Table | Validity flags *([see below](#validity-flags))* |
 | *tAcc* | Integer | Time accuracy estimate in ns (UTC) |
-| *nano* | Integer | Fraction of second in range -1e9 to +1e9 (UTC) |
+| *nano* | Integer | Fraction of second (ns) in range -1e9 to +1e9 (UTC) |
 | *fixType* | Integer | GNSSfix Type:<br />0 = No fix<br />1 = Dead reckoning only<br />2 = 2D fix<br />3 = 3D fix<br />4 = GNSS plus dead reckoning combined<br />5 = Time-only fix |
 | *fixStatusFlags* | Table | Fix status flags *([see below](#fix-status-flags))* |
 | *numSV* | Integer | Number of satellites used |
