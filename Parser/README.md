@@ -10,7 +10,7 @@ The parser is implemented as a table, so command-parsing functions can be added 
 
 No initialization is needed to use the parser, which is implemented as a table that is accessed via the global variable *UbxMsgParser*.
 
-There is [one helper method](#class-methods) available to convert the integer latitude and longitude values returned by UBX methods to a decimal degree string, a more common foramt for this data.
+There is [one helper method](#class-methods) available to convert the integer latitude and longitude values returned by UBX methods to a decimal degree string, a more common format for this data.
 
 The remaining slots in the parser table are identified by 16-bit integers: the UBX class message ID. For example, to parse the payload of a UBX message of type NAV_PVT, you would call:
 
