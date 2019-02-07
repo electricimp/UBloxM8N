@@ -1,10 +1,10 @@
-# UbxMsgParser 1.0.0 #
+# UbxMsgParser 1.0.1 #
 
 This library provides a parser for UBX binary messages. For information about UBX messages, please see [the u-blox protocol specification](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
 
 The parser is implemented as a table, so command-parsing functions can be added and existing ones easily customized. A small number of messages have been selected as a base. These commands are detailed in the [Class Methods](#class-methods) section below.
 
-**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:1.0.0"` **at the top of your code.**
+**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:1.0.1"` **at the top of your code.**
 
 ## Class Usage ##
 
@@ -275,30 +275,6 @@ Table &mdash; contains the following keys:
 | *safeBoot* | Integer | Safe boot mode:<br />0 = Inactive<br />1 = Active |
 | *jammingState* | Integer | Output from the Jamming/Interference Monitor:<br />0 = Unknown or feature disabled<br />1 = OK &mdash; no significant jamming<br />2 = Warning &mdash; interference visible but fix OK<br />3 = Critical &mdash; interference visible and no fix |
 | *xtalAbsent* | integer | RTC crystal has been determined to be absent. **Note** Not supported in protocol versions less than 18 |
-
-### 0x1360(*payload*) ###
-
-This method parses `0x1360` (MGA_ACK) UBX message payloads.
-
-#### Parameters ####
-
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| *payload* | Blob | Yes | An eight-byte MGA_ACK message payload |
-
-#### Returns ####
-
-Table &mdash; contains the following keys:
-
-| Key | Type | Description |
-| --- | --- | --- |
-| *error* | String or `null` | Error message if a parsing error was encountered, or `null` |
-| *payload* | Blob | The unparsed payload |
-| *type* | Integer | Type of acknowledgment:<br />0 = The message was not used by the receiver (see *infoCode* field for an indication of why)<br />1 = The message was accepted for use by the receiver (the *infoCode* field will be 0) |
-| *version* | Integer | Message version (0x00 for this version) |
-| *infoCode* | Integer | Provides greater information about what the receiver chose to do with the message contents:<br />0 = The receiver accepted the data<br />1 = The receiver doesn't know the time so can't use the data: supply a UBX-MGA-INITIME_UTC message first<br />2 = The message version is not supported by the receiver<br />3 = The message size does not match the message version<br />4 = The message data could not be stored in the database<br />5 = The receiver is not ready to use the message data<br />6 = The message type is unknown |
-| *msgId* | Integer | UBX message ID of the ACK’d message |
-| *msgPayloadStart* | Blob | The first four bytes of the ACK’d message’s payload |
 
 ## License ##
 

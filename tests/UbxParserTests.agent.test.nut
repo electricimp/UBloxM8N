@@ -810,44 +810,6 @@ class UbxParserTests extends ImpTestCase {
         return "Invalid MON-HW message returned expected error.";
     }
 
-    function testMgaAckValid() {
-        // binary: 01 00 00 06 02 00 18 00
-        // Tests all fields are present and are expected type & value
-        local payload = _createPayload(UBX_VALID_MSG.MGA_ACK);
-        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK](payload);
-
-        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
-        assertEqual(null, parsed.error, TEST_ERROR_MSG.ERROR_NOT_NULL);
-
-        assertTrue("type" in parsed && (typeof parsed.type == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "type"));
-        assertEqual(0x01, parsed.type, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "type"));
-
-        assertTrue("version" in parsed && (typeof parsed.version == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "version"));
-        assertEqual(0x00, parsed.version, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "version"));
-
-        assertTrue("infoCode" in parsed && (typeof parsed.infoCode == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "infoCode"));
-        assertEqual(0x00, parsed.infoCode, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "infoCode"));
-
-        assertTrue("msgId" in parsed && (typeof parsed.msgId == "integer"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "msgId"));
-        assertEqual(0x06, parsed.msgId, format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "msgId"));
-
-        assertTrue("msgPayloadStart" in parsed && (typeof parsed.msgPayloadStart == "blob"), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_TYPE, "msgPayloadStart"));
-        assertTrue(crypto.equals("\x02\x00\x18\x00", parsed.msgPayloadStart), format(TEST_ERROR_MSG.UNEXPECTED_FIELD_VAL, "msgPayloadStart"));
-
-        return "Valid MGA-ACK message parse test passed.";
-    }
-
-    function testMgaAckInvalid() {
-        local payload = _createPayload(UBX_INVALID_MSG.MGA_ACK);
-        local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK](payload);
-        local error = format(UbxMsgParser.ERROR_PARSING, "");
-
-        assertTrue(crypto.equals(payload, parsed.payload), TEST_ERROR_MSG.PAYLOAD);
-        assertTrue(parsed.error.find(error) != null, TEST_ERROR_MSG.ERROR_MISSING);
-
-        return "Invalid MGA-ACK message returned expected error.";
-    }
-
     function tearDown() {
         return "Test finished";
     }

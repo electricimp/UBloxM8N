@@ -10,7 +10,7 @@ This is a UART driver for u-blox M8N GPS module.
 
 [Library source code](./Driver/UBloxM8N.device.lib.nut)
 
-**To include this library in your project, add** `#require "UBloxM8N.device.lib.nut:1.0.0"` **at the top of your device code.**
+**To include this library in your project, add** `#require "UBloxM8N.device.lib.nut:1.0.1"` **at the top of your device code.**
 
 ## [UbxMsgParser](./Parser) ##
 
@@ -22,7 +22,7 @@ The parser is implemented as a table, so parsing functions can be added and cust
 
 [Library source code](./Parser/UbxMsgParser.lib.nut)
 
-**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:1.0.0"` **at the top of your code.**
+**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:1.0.1"` **at the top of your code.**
 
 ## [Examples](./Examples) ##
 

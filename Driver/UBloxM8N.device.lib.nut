@@ -28,6 +28,8 @@ enum UBLOX_M8N_CONST {
     UBX_SYNC_CHAR_2          = 0x62,
     UBX_CFG_PRT_CLASS_MSG_ID = 0x0600,      // Used in driver class configure
     UBX_CFG_MSG_CLASS_MSG_ID = 0x0601,      // Used in driver class enableUBXMsg
+    UBX_MGA_ACK_CLASS_ID     = 0x1360,
+    UBX_MON_VER_CLASS_ID     = 0x0a04,
 
     NMEA_CONFIG_MSG_HEADER   = "PUBX,41",
     NMEA_LINE_MAX            = 150,
@@ -47,6 +49,8 @@ enum UBLOX_M8N_CONST {
     DEFAULT_ON_MSG           = "default",
     ON_NMEA_MSG              = "nmea",
     ON_UBX_MSG               = "ubx",
+
+    ASSIST_NOW_ERROR         = "Error: Message callback for %i used by Assist Now library. Use Assist Now class methods to get message payload";
 }
 
 enum UBLOX_M8N_MSG_MODE {
@@ -64,7 +68,7 @@ enum UBLOX_M8N_MSG_MODE {
  */
 class UBloxM8N {
 
-    static VERSION = "1.0.0";
+    static VERSION = "1.0.1";
 
     _currBaudRate = null;
     _gpsuart      = null;
@@ -77,6 +81,9 @@ class UBloxM8N {
     _collecting   = null;
 
     _msgHandlers  = null;
+
+    // For AssistNow Compatibility
+    blockAssistNowMsgCallbacks = false;
 
     /**
      * Initializes Ublox M8N driver object. The constructor will initialize the specified hardware.uart object
@@ -91,6 +98,9 @@ class UBloxM8N {
      *      configure the imp uart.
      */
     constructor(uart, bootTimeoutSec = UBLOX_M8N_CONST.DEFAULT_BOOT_TIMEOUT, baudRateAtBoot = UBLOX_M8N_CONST.DEFUALT_BAUDRATE) {
+        local rt = getroottable();
+        if ("UBloxAssistNow" in rt) blockAssistNowMsgCallbacks = true;
+
         _currBaudRate = baudRateAtBoot;
         _gpsuart = uart;
         _gpsuart.configure(_currBaudRate, 8, PARITY_NONE, 1, NO_CTSRTS, _createUartCallback(UBLOX_M8N_MSG_MODE.BOTH));
@@ -212,6 +222,11 @@ class UBloxM8N {
      *      as an optional parameter. NMEA handlers do not need this parameter.
      */
     function registerOnMessageCallback(type, onMessage) {
+        if (blockAssistNowMsgCallbacks &&
+           (type == UBLOX_M8N_CONST.UBX_MGA_ACK_CLASS_ID || type == UBLOX_M8N_CONST.UBX_MON_VER_CLASS_ID)) {
+            throw format(UBLOX_M8N_CONST.ASSIST_NOW_ERROR, type);
+        }
+
         if (onMessage == null) {
             if (type in _msgHandlers) _msgHandlers.rawdelete(type);
         } else {
@@ -235,6 +250,12 @@ class UBloxM8N {
      * @param {blob/string} payload - NMEA sentence or UBX message payload.
      */
     function enableUbxMsg(classId, rate, onMessage = null) {
+        // Throw error if message used by assist now library
+        if (blockAssistNowMsgCallbacks &&
+           (classId == UBLOX_M8N_CONST.UBX_MGA_ACK_CLASS_ID || classId == UBLOX_M8N_CONST.UBX_MON_VER_CLASS_ID)) {
+            throw format(UBLOX_M8N_CONST.ASSIST_NOW_ERROR, type);
+        }
+
         if (rate == 0 || onMessage == null) {
             // Delete callback
             if (classId in _msgHandlers) _msgHandlers.rawdelete(classId);
