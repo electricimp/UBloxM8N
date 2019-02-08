@@ -50,7 +50,7 @@ enum UBLOX_M8N_CONST {
     ON_NMEA_MSG              = "nmea",
     ON_UBX_MSG               = "ubx",
 
-    ASSIST_NOW_ERROR         = "Error: Message callback for %i used by Assist Now library. Use Assist Now class methods to get message payload";
+    ASSIST_NOW_ERROR         = "Error: Message callback for %i used by Assist Now library. Use Assist Now class methods to get message payload"
 }
 
 enum UBLOX_M8N_MSG_MODE {

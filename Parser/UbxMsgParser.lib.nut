@@ -29,8 +29,7 @@ enum UBX_MSG_PARSER_CLASS_MSG_ID {
     ACK_ACK   = 0x0501,
     ACK_NAK   = 0x0500,
     MON_HW    = 0x0a09,
-    MON_VER   = 0x0a04,
-    MGA_ACK   = 0x1360
+    MON_VER   = 0x0a04
 }
 
 /**
