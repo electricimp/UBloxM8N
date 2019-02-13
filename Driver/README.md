@@ -83,7 +83,7 @@ For more information, please see [‘Received Message Callbacks’](#received-me
 
 To disable messages, specify a rate of 0. If messaging is disabled, the callback will be de-registered.
 
-**Note:** If using UBloxAssistNow Library an error will be thrown if this method is used to enable/disable MGA-ACK (0x1360) or MON-VER (0x0a04) messages. The payloads for these messages can be retrieved via UBloxAssistNow class methods.
+**Note:** If using UBloxAssistNow Library an error will be thrown if this method is used to enable/disable MGA-ACK (0x1360) or MON-VER (0x0a04) messages. The payload for MON-VER message can be retrieved via UBloxAssistNow class method.
 
 #### Parameters ####
 
@@ -105,7 +105,7 @@ For more information, please see [‘Received Message Callbacks’](#received-me
 
 To de-register a callback, pass `null` into the *callback* parameter.
 
-**Note:** If using UBloxAssistNow Library an error will be thrown if this method is used to enable/disable MGA-ACK (0x1360) or MON-VER (0x0a04) messages. The payloads for these messages can be retrieved via UBloxAssistNow class methods.
+**Note:** If using UBloxAssistNow Library an error will be thrown if this method is used to enable/disable MGA-ACK (0x1360) or MON-VER (0x0a04) messages. The payload for MON-VER message can be retrieved via UBloxAssistNow class method.
 
 #### Parameters ####
 
