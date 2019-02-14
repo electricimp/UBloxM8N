@@ -1,10 +1,10 @@
-# UbxMsgParser 1.0.1 #
+# UbxMsgParser 2.0.0 #
 
 This library provides a parser for UBX binary messages. For information about UBX messages, please see [the u-blox protocol specification](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
 
 The parser is implemented as a table, so command-parsing functions can be added and existing ones easily customized. A small number of messages have been selected as a base. These commands are detailed in the [Class Methods](#class-methods) section below.
 
-**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:1.0.1"` **at the top of your code.**
+**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:2.0.0"` **at the top of your code.**
 
 ## Class Usage ##
 
@@ -211,9 +211,27 @@ Table &mdash; contains the following keys:
 | *payload* | Bblob | The unparsed payload |
 | *nakMsgClassId* | Integer | The two-byte message class and ID of the NAK’d message |
 
-### 0x0A04(*payload*) REMOVED ###
+### 0x0A04(*payload*) ###
 
-Support for MON_VER UBX messages has been removed from this release. Please use the [UBloxAssistNow library](https://github.com/electricimp/UBloxAssistNow) instead.
+This method parses `0x0a04` (MON_VER) UBX message payloads.
+
+#### Parameters ####
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| *payload* | Blob | Yes | 40 + 30 * n bytes of MON_VER message payload |
+
+#### Returns ####
+
+Table &mdash; contains the following keys:
+
+| Key | Type | Description |
+| --- | --- | --- |
+| *error* | String or `null` | Error message if a parsing error was encountered, or `null` |
+| *payload* | Blob | The unparsed payload |
+| *swVersion* | String | The software Version |
+| *hwVersion* | Sting | The hardware Version |
+| *exSwInfo* | Array of strings | Extended software information strings, if any |
 
 ### 0x0A09(*payload*) ###
 
@@ -258,10 +276,6 @@ Table &mdash; contains the following keys:
 | *jammingState* | Integer | Output from the Jamming/Interference Monitor:<br />0 = Unknown or feature disabled<br />1 = OK &mdash; no significant jamming<br />2 = Warning &mdash; interference visible but fix OK<br />3 = Critical &mdash; interference visible and no fix |
 | *xtalAbsent* | integer | RTC crystal has been determined to be absent. **Note** Not supported in protocol versions less than 18 |
 
-### 0x1360(*payload*) REMOVED ###
-
-Support for MGA_ACK UBX messages has been removed from this release. Please use the [UBloxAssistNow library](https://github.com/electricimp/UBloxAssistNow) instead.
-
-# License ##
+## License ##
 
 This library is licensed under the [MIT License](./LICENSE).
