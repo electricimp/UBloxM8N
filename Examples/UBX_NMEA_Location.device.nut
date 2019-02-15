@@ -25,9 +25,9 @@
 // INCLUDE LIBRARIES
 // ----------------------------------------------------------------------------------------
 
-#require "UBloxM8N.device.lib.nut:1.0.0"
+#require "UBloxM8N.device.lib.nut:1.0.1"
 #require "GPSParser.device.lib.nut:1.0.0"
-#require "UbxMsgParser.lib.nut:1.0.0"
+#require "UbxMsgParser.lib.nut:2.0.0"
 
 // HELPER FUNCTIONS
 // ----------------------------------------------------------------------------------------

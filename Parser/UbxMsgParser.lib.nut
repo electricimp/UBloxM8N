@@ -29,8 +29,7 @@ enum UBX_MSG_PARSER_CLASS_MSG_ID {
     ACK_ACK   = 0x0501,
     ACK_NAK   = 0x0500,
     MON_HW    = 0x0a09,
-    MON_VER   = 0x0a04,
-    MGA_ACK   = 0x1360
+    MON_VER   = 0x0a04
 }
 
 /**
@@ -49,7 +48,7 @@ enum UBX_MSG_PARSER_CLASS_MSG_ID {
  * @table
  */
 UbxMsgParser <- {
-    "VERSION" : "1.0.0",
+    "VERSION" : "2.0.0",
     "ERROR_PARSING" : "Error: Could not parse payload, %s",
 
     "toDecimalDegreeString" : function(deg) {
@@ -509,53 +508,6 @@ UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MON_HW] <- function(payload) {
         parsed.pullL <- payload.readblob(4);
 
         return parsed;
-    } catch(e) {
-        return {
-            "error"   : format(ERROR_PARSING, e),
-            "payload" : payload
-        }
-    }
-};
-
-/**
- * @typedef {table} UBX_MGA_ACK
- * @property {integer} type - Type of acknowledgment: 0 = The message was not
- *      used by the receiver (see infoCode field for an indication of why), 1 = The
- *      message was accepted for use by the receiver (the infoCode field will be 0)
- * @property {integer} version - Message version (0x00 for this version)
- * @property {integer} infoCode - Provides greater information on what the
- *      receiver chose to do with the message contents: 0 = The receiver accepted
- *      the data, 1 = The receiver doesn't know the time so can't use the data
- *      (To resolve this a UBX-MGA-INITIME_UTC message should be supplied first),
- *      2 = The message version is not supported by the receiver, 3 = The message
- *      size does not match the message version, 4 = The message data could not be
- *      stored to the database, 5 = The receiver is not ready to use the message
- *      data, 6 = The message type is unknown
- * @property {integer} msgId - UBX message ID of the ack'ed message
- * @property {blob} msgPayloadStart - The first 4 bytes of the ack'ed message's payload
- */
-
-/**
- * Parses 0x1360 (MGA_ACK) UBX message payload.
- *
- * @param {blob} payload - parses 8 bytes bytes MGA_ACK message payload.
- *
- * @return {UBX_MGA_ACK}
- */
-UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.MGA_ACK] <- function(payload) {
-    // 0x1360: Expected payload size = 8 bytes
-    try {
-        payload.seek(0, 'b');
-        // TODO: here and everywhere else probably it makes sense to check for length before we read
-        return {
-            "type"            : payload.readn('b'),
-            "version"         : payload.readn('b'),
-            "infoCode"        : payload.readn('b'),
-            "msgId"           : payload.readn('b'),
-            "msgPayloadStart" : payload.readblob(4),
-            "error"           : null,
-            "payload"         : payload
-        }
     } catch(e) {
         return {
             "error"   : format(ERROR_PARSING, e),

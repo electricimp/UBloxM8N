@@ -103,8 +103,6 @@ class StubbedUart {
         // Move pointer to next read
         _rBuff.seek(rPtr, 'b');
 
-        server.log(_rBuff);
-
         // Trigger callback
         if (_cb) imp.wakeup(0, _cb);
     }

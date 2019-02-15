@@ -1,8 +1,8 @@
-# UBloxM8N 1.0.0 #
+# UBloxM8N 1.0.1 #
 
 This library provides a driver for a [u-blox M8N GPS module](https://www.u-blox.com/en/product/neo-m8-series) connected to the host imp via UART.
 
-**To include this library in your project, add** `#require "UBloxM8N.device.lib.nut:1.0.0"` **at the top of your device code.**
+**To include this library in your project, add** `#require "UBloxM8N.device.lib.nut:1.0.1"` **at the top of your device code.**
 
 ## Class Usage ##
 
@@ -83,6 +83,8 @@ For more information, please see [‘Received Message Callbacks’](#received-me
 
 To disable messages, specify a rate of 0. If messaging is disabled, the callback will be de-registered.
 
+**Note** If you are also using the [UBloxAssistNow library](https://github.com/electricimp/UBloxAssistNow), an exception will be thrown if this method is used to enable or disable MGA-ACK (0x1360) or MON-VER (0x0a04) messages. The payload for MON-VER message can be retrieved with a UBloxAssistNow class method.
+
 #### Parameters ####
 
 | Parameter | Type | Required | Description |
@@ -102,6 +104,8 @@ This method registers a message-specific or type-specific callback that will han
 For more information, please see [‘Received Message Callbacks’](#received-message-callbacks), above.
 
 To de-register a callback, pass `null` into the *callback* parameter.
+
+**Note** If you are also using the [UBloxAssistNow library](https://github.com/electricimp/UBloxAssistNow), an exception will be thrown if this method is used to enable or disable MGA-ACK (0x1360) or MON-VER (0x0a04) messages. The payload for MON-VER message can be retrieved with a UBloxAssistNow class method.
 
 #### Parameters ####
 
