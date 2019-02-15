@@ -1,4 +1,4 @@
-# UBloxM8N 1.0.1 #
+# UBloxM8N #
 
 Electric Imp offers two libraries to support the [u-blox M8N GPS module](https://www.u-blox.com/en/product/neo-m8-series): a device-side driver class, and a message parser. The libraries are based on the commands defined in the [u-blox receiver protocol specification](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
 
