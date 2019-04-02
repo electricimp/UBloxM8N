@@ -123,7 +123,7 @@ function navMsgHandler(payload) {
     local parsed = UbxMsgParser[UBX_MSG_PARSER_CLASS_MSG_ID.NAV_PVT](payload);
     logUBX(parsed);
 
-    if (lat in parsed && lon in parsed) {
+    if ("lat" in parsed && "lon" in parsed) {
         server.log(format("Lat: %s, Lon: %s",
             UbxMsgParser.toDecimalDegreeString(parsed.lat),
             UbxMsgParser.toDecimalDegreeString(parsed.lon)));
