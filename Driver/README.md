@@ -15,7 +15,7 @@ When a valid message is received from the M8N, it will be passed to a message ca
 3. If no type-specific callback has been registered, the *defaultOnMsg* callback will be used.
 4. If no default callback has been registered, the message will be ignored.
 
-Type-specific callbacks can be registered using the methods [*configure()*](#configureoptions) and/or [*registerOnMessageCallback()*](#registeronmessagecallbacktype-callback). The latter can also be used to register message-specific callbacks, as can [*enableUbxMsg()*](#enableubxmsgclassid-rate-callback).
+Type-specific callbacks can be registered using the methods [*configure()*](#configureoptions) and/or [*registerOnMessageCallback()*](#registeronmessagecallbackidortype-callback). The latter can also be used to register message-specific callbacks, as can [*enableUbxMsg()*](#enableubxmsgclassid-rate-callback).
 
 #### Callback Parameter Details ####
 
