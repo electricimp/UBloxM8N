@@ -20,7 +20,7 @@ The parser is implemented as a table, so parsing functions can be added and cust
 - [Documentation](./Parser/README.md)
 - [Source code](./Parser/UbxMsgParser.lib.nut)
 
-**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:2.0.0"` **at the top of your code.**
+**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:2.0.1"` **at the top of your code.**
 
 ## [Examples](./Examples) ##
 
