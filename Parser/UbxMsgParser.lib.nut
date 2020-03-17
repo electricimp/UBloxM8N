@@ -48,11 +48,15 @@ enum UBX_MSG_PARSER_CLASS_MSG_ID {
  * @table
  */
 UbxMsgParser <- {
-    "VERSION" : "2.0.0",
+    "VERSION" : "2.0.1",
     "ERROR_PARSING" : "Error: Could not parse payload, %s",
 
     "toDecimalDegreeString" : function(deg) {
-        return format("%d.%07d", deg / 10000000, math.abs(deg % 10000000));
+        if (deg < 0) {
+            return format("-%d.%07d", -deg / 10000000, -deg % 10000000);
+        } else {
+            return format("%d.%07d", deg / 10000000, deg % 10000000);
+        }
     }
 }
 

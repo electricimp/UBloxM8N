@@ -1,10 +1,10 @@
-# UbxMsgParser 2.0.0 #
+# UbxMsgParser 2.0.1 #
 
 This library provides a parser for UBX binary messages. For information about UBX messages, please see [the u-blox protocol specification](https://www.u-blox.com/sites/default/files/products/documents/u-blox8-M8_ReceiverDescrProtSpec_%28UBX-13003221%29_Public.pdf).
 
 The parser is implemented as a table, so command-parsing functions can be added and existing ones easily customized. A small number of messages have been selected as a base. These commands are detailed in the [Class Methods](#class-methods) section below.
 
-**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:2.0.0"` **at the top of your code.**
+**To include this library in your project, add** `#require "UbxMsgParser.lib.nut:2.0.1"` **at the top of your code.**
 
 ## Class Usage ##
 
